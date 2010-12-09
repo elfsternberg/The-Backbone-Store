@@ -1,0 +1,21 @@
+The Backbone Store is a simple demonstration application, a Backbone.js
+version of the Sammy.js tutorial.
+
+## Installation
+
+The Backbone store must be installed under a webserver in order to
+operate correctly.  Chrome, especially, will not initialize the
+application from the filesystem.  Just unpack it in a target directory
+of your choosing and then browse to that directory.
+
+## Copyright
+
+Store.js is entirely my own work, and is Copyright (c) 2010 Elf
+M. Sternberg.  Included libraries are covered by their respective
+copyright holders, and are used with permission of the licenses
+included.  Store.js is intended for educational purposes only, rather
+than to be working code, and is hereby licensed under the Creative
+Commons Attribution Non-Commercial Share Alike (by-nc-sa) licence.
+
+The images contained herein are derivative works of photographs
+licensed under Creative Commons licences for non-commercial purposes.
