@@ -3,6 +3,12 @@
 \usepackage{hyperref}
 \begin{document}
 
+% Generate code and documentation with:
+%
+% noweave -filter l2h -delay -x -html backbonestore.nw | htmltoc > backbonestore.html
+% notangle -Rstore.js backbonestore.nw > store.js
+% notangle -Rindex.html backbonestore.nw > index.html
+
 I've been learning how to use \nwanchorto{http://documentcloud.github.com/backbone/}{Backbone.js}, a nifty little library for
 organizing your client-side Javascript into a classic
 Model-View-Controller paradigm while trying (and to some extent,
@@ -139,7 +145,7 @@ var IndexView = Backbone.View.extend({
 @ 
 
 This code defines a [[Backbone.View]] object, in which the parent element
-is #main, the render function fades out the existing elements in that
+is \#main, the render function fades out the existing elements in that
 position and replaces them with the contents of a rendered jQuery
 template, and then fades the element back in.
 
