@@ -45,14 +45,12 @@ var ProductView = Backbone.View.extend({
     itemTemplate: $("#itemTmpl").template(),
 
     events: {
-        "keypress .uqf"      : "updateOnEnter",
-        "click .uq"              : "update",
+        "keypress .uqf" : "updateOnEnter",
+        "click .uq"     : "update",
     },
 
     initialize: function(options) {
-        if (options.cart) {
-            this.cart = options.cart;
-        }
+        this.cart = options.cart;
     },
 
     update: function(e) {
@@ -80,7 +78,7 @@ var ProductView = Backbone.View.extend({
         });
         return this;
     }
-})
+});
 
 
 var IndexView = Backbone.View.extend({
@@ -121,14 +119,9 @@ var Workspace = Backbone.Controller.extend({
                 success: function(data) {
                     ws._cart = new Cart();
                     new CartView({model: ws._cart});
-                    ws._products = new ProductCollection();
-                    ws._products.refresh(data);
+                    ws._products = new ProductCollection(data);
                     ws._index = new IndexView({model: ws._products});
-                    if (Backbone.history) {
-                        Backbone.history.loadUrl()
-                    } else {
-                        ws.index();
-                    }
+                    Backbone.history.loadUrl();
                 }
             });
             return this;
@@ -137,21 +130,10 @@ var Workspace = Backbone.Controller.extend({
     },
 
     index: function() {
-        /* Race sentinel. : View loaded before data ready.
-         * Backbone.history will load as appropriate. */
-        if (this._index === null) { 
-            return; 
-        }
-
         this._index.render();
     },
 
     item: function(id) {
-        if (this._products === null) {
-            /* Race sentinel.  That's two.  I'm Doing Something Wrong. */
-            return;
-        }
-
         if (_.isUndefined(this._products.getByCid(id)._view)) {
             this._products.getByCid(id)._view = new ProductView({model: this._products.getByCid(id),
                                                                  cart: this._cart});
