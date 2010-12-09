@@ -19,3 +19,9 @@ Commons Attribution Non-Commercial Share Alike (by-nc-sa) licence.
 
 The images contained herein are derivative works of photographs
 licensed under Creative Commons licences for non-commercial purposes.
+
+## Contribution
+
+Please look in backbonestore.nw for the base code.  Backbonestore.nw
+is produced using the Noweb Literate Programming toolkit by Norman
+Ramsey (http://www.cs.tufts.edu/~nr/noweb/).
