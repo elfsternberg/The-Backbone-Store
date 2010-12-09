@@ -1,0 +1,58 @@
+/******************************************************
+ *  json store                 *
+\*****************************************************/
+body {
+  font-family: "Lucida Grande", Lucida, Helvetica, Arial, sans-serif;
+  background: #FFF;
+  color: #333;
+  margin: 0px;
+  padding: 0px;
+}
+
+#header {
+  background: #C97E41;
+  margin: 0px;
+  padding: 20px;
+}
+#header h1 {
+  font-family: Inconsolata, Monaco, Courier, mono;
+  color: #FFF;
+  margin: 0px;
+}
+#header .cart-info {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  text-align: right;
+  padding: 10px;
+  background: #714625;
+  color: #FFF;
+  font-size: 12px;
+  font-weight: bold;
+}
+img {
+  border: 0;
+}
+
+.item {
+  float:left;
+  width: 250px;
+  margin-right: 3px;
+  padding: 2px;
+  border: 1px solid #ccc;
+  text-align:center;
+  font-size: 12px;
+}
+.item-title {
+  font-weight: bold;
+}
+.item-artist {
+  font-weight: bold;
+  font-size: 14px;
+}
+.item-detail .item-image {
+  float:left;
+}
+.item-detail .item-info {
+  padding: 100px 10px 0px 10px;
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Unless You Have Been Drinking",
+    "artist": "Adventures in Odyssey",
+    "image": "images/AdventuresInOdyssey_t.jpg",
+    "large_image": "images/AdventuresInOdyssey.jpg",
+    "price": 9.98,
+    "url": "http://www.amazon.com/Door-Religious-Knives/dp/B001FGW0UQ/?tag=quirkey-20"
+  },
+  {
+    "title": "Leave To Do My Utmost",
+    "artist": "American Attorneys",
+    "image": "images/AmericanAttorneys_t.jpg",
+    "large_image": "images/AmericanAttorneys.jpg",
+    "price": 13.98,
+    "url": "http://www.amazon.com/gp/product/B002GNOMJE?ie=UTF8&tag=quirkeycom-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=B002GNOMJE"
+  },
+  {
+    "title": "The Dead Sleep Encircled by The Living",
+    "artist": "British Civil Light Transport",
+    "image": "images/BritishCivilLightTransport_t.jpg",
+    "large_image": "images/BritishCivilLightTransport.jpg",
+    "price": 13.98,
+    "url": "http://www.amazon.com/Bitte-Orca-Dirty-Projectors/dp/B0026T4RTI/ref=pd_sim_m_12?tag=quirkey-20"
+  },
+  {
+    "title": "Periods of Mental Assimilation",
+    "artist": "Grigory Szondy",
+    "image": "images/PeriodsofMentalAssimilation_t.jpg",
+    "large_image": "images/PeriodsofMentalAssimilation.jpg",
+    "price": 13.99,
+    "url": "http://www.amazon.com/Pains-Being-Pure-Heart/dp/B001LGXIDS/ref=pd_sim_m_44?tag=quirkey-20"
+  },
+  {
+    "title": "Keenly Developed Moral Bankruptcy",
+    "artist": "Stealth Monkey Virus",
+    "image": "images/StealthMonkeyVirus_t.jpg",
+    "large_image": "images/StealthMonkeyVirus.png",
+    "price": 13.99,
+    "url": "http://www.amazon.com/Pains-Being-Pure-Heart/dp/B001LGXIDS/ref=pd_sim_m_44?tag=quirkey-20"
+  },
+  {
+    "title": "My Mistress's Sparrow is Dead",
+    "artist": "Sums of Mongolia",
+    "image": "images/SumsofMagnolia_t.jpg",
+    "large_image": "images/SumsofMagnolia.jpg",
+    "price": 13.99,
+    "url": "http://www.amazon.com/Pains-Being-Pure-Heart/dp/B001LGXIDS/ref=pd_sim_m_44?tag=quirkey-20"
+  }
+]
