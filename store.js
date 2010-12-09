@@ -7,7 +7,6 @@ var ProductCollection = Backbone.Collection.extend({
     }
 });
 
-
 var CartItem = Backbone.Model.extend({
     update: function(amount) {
         this.set({'quantity': this.get('quantity') + amount});
@@ -21,7 +20,6 @@ var Cart = Backbone.Collection.extend({
         return this.detect(function(obj) { return (obj.get('product').cid == pid); });
     },
 });
-
 
 var CartView = Backbone.View.extend({
     el: $('.cart-info'),
@@ -38,7 +36,6 @@ var CartView = Backbone.View.extend({
             .animate({paddingTop: '10px'});
     }
 });
-
 
 var ProductView = Backbone.View.extend({
     el: $('#main'),
@@ -97,8 +94,6 @@ var IndexView = Backbone.View.extend({
 
 });
 
-
-    
 var Workspace = Backbone.Controller.extend({
     _index: null,
     _products: null,
