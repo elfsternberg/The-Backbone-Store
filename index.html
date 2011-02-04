@@ -2,46 +2,47 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
-        <title>The Backbone Store</title>
+        <title>
+            The Backbone Store
+        </title>
         <link rel="stylesheet" href="jsonstore.css" type="text/css" media="screen" charset="utf-8" />
 
-                <script id="indexTmpl" type="text/x-jquery-tmpl">
-                <div class="item">
-                 <div class="item-image">
-                     <a href="#item/${cid}"><img src="${attributes.image}" alt="${attributes.title}" /></a>
-                 </div>
-                 <div class="item-artist">${attributes.artist}</div>
-                    <div class="item-title">${attributes.title}</div>
-                    <div class="item-price">$${attributes.price}</div>
-                </div>
-                </script>
+          <script id="indexTmpl" type="text/x-jquery-tmpl">
+            <div class="item">
+              <div class="item-image">
+                <a href="#item/${cid}"><img src="${image}" alt="${title}" /></a>
+              </div>
+              <div class="item-artist">${artist}</div>
+              <div class="item-title">${title}</div>
+              <div class="item-price">$${price}</div>
+            </div>
+          </script>
 
-                <script id="itemTmpl" type="text/x-jquery-tmpl">
-                <div class="item-detail">
-                  <div class="item-image"><img src="${attributes.large_image}" alt="${attributes.title}" /></div>
-                  <div class="item-info">
-                    <div class="item-artist">${attributes.artist}</div>
-                    <div class="item-title">${attributes.title}</div>
-                    <div class="item-price">$${attributes.price}</div>
-                    <div class="item-form">
-                      <form action="#/cart" method="post">
-                        <input type="hidden" name="item_id" value="${cid}" />
-                        <p>
-                          <label>Quantity:</label>
-                          <input type="text" size="2" name="quantity" value="1" class="uqf" />
-                        </p>
-                        <p><input type="submit" value="Add to Cart" class="uq" /></p>
-                      </form>
-                    </div>
-                    <div class="item-link"><a href="${attributes.url}">Buy this item on Amazon</a></div>
-                    <div class="back-link"><a href="#">&laquo; Back to Items</a></div>
-                  </div>
-                </div>
-                </script>
+        <script id="itemTmpl" type="text/x-jquery-tmpl">
+          <div class="item-detail">
+            <div class="item-image"><img src="${large_image}" alt="${title}" /></div>
+            <div class="item-info">
+              <div class="item-artist">${artist}</div>
+              <div class="item-title">${title}</div>
+              <div class="item-price">$${price}</div>
+              <div class="item-form">
+                <form action="#/cart" method="post">
+                  <input type="hidden" name="item_id" value="${cid}" />
+                  <p>
+                    <label>Quantity:</label>
+                    <input type="text" size="2" name="quantity" value="1" class="uqf" />
+                  </p>
+                  <p><input type="submit" value="Add to Cart" class="uq" /></p>
+                </form>
+              </div>
+              <div class="item-link"><a href="${url}">Buy this item on Amazon</a></div>
+              <div class="back-link"><a href="#">&laquo; Back to Items</a></div>
+            </div>
+          </div>
+        </script>
 
     </head>
+
     <body>
         <div id="container">
             <div id="header">
@@ -54,10 +55,9 @@
                 </div>
             </div>
 
-            <div id="main">
-            </div>
+            <div id="main"> </div>
         </div>
-        <script src="jquery-1.4.4.min.js" type="text/javascript"></script>
+        <script src="jquery-1.5.js" type="text/javascript"></script>
         <script src="jquery.tmpl.min.js" type="text/javascript"></script>
         <script src="underscore.js" type="text/javascript"></script>
         <script src="backbone.js" type="text/javascript"></script>
