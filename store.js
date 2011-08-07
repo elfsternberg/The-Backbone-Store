@@ -1,82 +1,119 @@
 (function() {
 
-    var Product = Backbone.Model.extend({
-        toJSON: function() {
-            return _.extend(_.clone(this.attributes), {cid: this.cid})
-        }
-    });
+    var Product = Backbone.Model.extend({})
 
     var ProductCollection = Backbone.Collection.extend({
         model: Product,
+
+        initialize: function(models, options) {
+            this.url = options.url;
+        },
 
         comparator: function(item) {
             return item.get('title');
         }
     });
 
-    var CartItem = Backbone.Model.extend({
+    var Item = Backbone.Model.extend({
         update: function(amount) {
             this.set({'quantity': this.get('quantity') + amount});
         }
     });
 
-    var Cart = Backbone.Collection.extend({
-        model: CartItem,
-        getByProductId: function(pid) {
-            return this.detect(function(obj) { return (obj.get('product').cid == pid); });
-        },
-    });
-
-
-    var CartView = Backbone.View.extend({
-        el: $('.cart-info'),
-        
-        initialize: function() {
-            this.collection.bind('change', _.bind(this.render, this));
-        },
-        
-        render: function() {
-            var sum = this.collection.reduce(function(m, n) { return m + n.get('quantity'); }, 0);
-            this.el
-                .find('.cart-items').text(sum).end()
-                .animate({paddingTop: '30px'})
-                .animate({paddingTop: '10px'});
-        }
-    });
-
-
-    var ProductListView = Backbone.View.extend({
-        el: $('#main'),
-        indexTemplate: $("#indexTmpl").template(),
-        
-        render: function() {
-            var self = this;
-            this.el.fadeOut('fast', function() {
-                self.el.html($.tmpl(self.indexTemplate, self.model.toJSON()));
-                self.el.fadeIn('fast');
+    var ItemCollection = Backbone.Collection.extend({
+        model: Item,
+        getOrCreateItemForProduct: function(product) {
+            var i, 
+            pid = product.get('id'),
+            o = this.detect(function(obj) { 
+                return (obj.get('product').get('id') == pid); 
             });
-            return this;
+            if (o) { 
+                return o;
+            }
+            i = new Item({'product': product, 'quantity': 0})
+            this.add(i, {silent: true})
+            return i;
+        },
+        getTotalCount: function() {
+            return this.reduce(function(memo, obj) { 
+                return obj.get('quantity') + memo; }, 0);
+        },
+        getTotalCost: function() {
+            return this.reduce(function(memo, obj) { 
+                return (obj.get('product').get('price') * 
+                        obj.get('quantity')) + memo; }, 0);
+
         }
     });
 
+    var _BaseView = Backbone.View.extend({
+        parent: $('#main'),
+        className: 'viewport',
 
-    var ProductView = Backbone.View.extend({
-        el: $('#main'),
-        itemTemplate: $("#itemTmpl").template(),
+        initialize: function() {
+            this.el = $(this.el);
+            this.el.hide();
+            this.parent.append(this.el);
+            return this;
+        },
+
+        hide: function() {
+            if (this.el.is(":visible") === false) {
+                return null;
+            }
+            promise = $.Deferred(_.bind(function(dfd) { 
+                this.el.fadeOut('fast', dfd.resolve)}, this)).promise();
+            this.trigger('hide', this);
+            return promise;
+        },
+
+        show: function() {
+            if (this.el.is(':visible')) {
+                return;
+            }       
+            promise = $.Deferred(_.bind(function(dfd) { 
+                this.el.fadeIn('fast', dfd.resolve) }, this)).promise();
+
+            this.trigger('show', this);
+            return promise;
+        }
+    });
+
+    var ProductListView = _BaseView.extend({
+        id: 'productlistview',
+        template: $("#store_index_template").html(),
 
         initialize: function(options) {
-            this.cart = options.cart;
+            this.constructor.__super__.initialize.apply(this, [options])
+            this.collection.bind('reset', _.bind(this.render, this));
+        },
+
+        render: function() {
+            this.el.html(_.template(this.template, 
+                                    {'products': this.collection.toJSON()}))
+            return this;
+        }
+    });
+
+    var ProductView = _BaseView.extend({
+        id: 'productitemview',
+        template: $("#store_item_template").html(),
+        initialize: function(options) {
+            this.constructor.__super__.initialize.apply(this, [options])
+            this.itemcollection = options.itemcollection;
+            this.item = this.itemcollection.getOrCreateItemForProduct(this.model);
             return this;
         },
-        
+
+        events: {
+            "keypress .uqf" : "updateOnEnter",
+            "click .uq"     : "update",
+        },
+
         update: function(e) {
             e.preventDefault();
-            var cart_item = this.cart.getByProductId(this.model.cid);
-            if (_.isUndefined(cart_item)) {
-                cart_item = new CartItem({product: this.model, quantity: 0});
-                this.cart.add(cart_item, {silent: true});
-            }
-            cart_item.update(parseInt($('.uqf').val()));
+            this.item.update(parseInt($('.uqf').val()));
         },
         
         updateOnEnter: function(e) {
@@ -85,68 +122,82 @@
             }
         },
 
-        events: {
-            "keypress .uqf" : "updateOnEnter",
-            "click .uq"     : "update",
-        },
-
         render: function() {
-            var self = this;
-            this.el.fadeOut('fast', function() {
-                self.el.html($.tmpl(self.itemTemplate, self.model.toJSON()));
-                self.el.fadeIn('fast');
-            });
+            this.el.html(_.template(this.template, this.model.toJSON()));
             return this;
         }
     });
 
+    var CartWidget = Backbone.View.extend({
+        el: $('.cart-info'),
+        template: $('#store_cart_template').html(),
+        
+        initialize: function() {
+            this.collection.bind('change', _.bind(this.render, this));
+        },
+        
+        render: function() {
+            console.log(arguments);
+            this.el.html(
+                _.template(this.template, {
+                    'count': this.collection.getTotalCount(),
+                    'cost': this.collection.getTotalCost()
+                })).animate({paddingTop: '30px'})
+                .animate({paddingTop: '10px'});
+        }
+    });
 
-    var BackboneStore = Backbone.Controller.extend({
-        _index: null,
-        _products: null,
-        _cart :null,
+    var BackboneStore = Backbone.Router.extend({
+        views: {},
+        products: null,
+        cart: null,
+
         routes: {
             "": "index",
-            "item/:id": "item",
+            "item/:id": "product",
         },
 
         initialize: function(data) {
-            this._cart = new Cart();
-            new CartView({collection: this._cart});
-            this._products = new ProductCollection(data);
-            this._index = new ProductListView({model: this._products});
+            this.cart = new ItemCollection();
+            new CartWidget({collection: this.cart});
+
+            this.products = new ProductCollection([], {
+                url: 'data/items.json'});
+            this.views = {
+                '_index': new ProductListView({
+                    collection: this.products
+                })
+            };
+            $.when(this.products.fetch({reset: true}))
+                .then(function() { window.location.hash = ''; });
             return this;
         },
 
-        index: function() {
-            this._index.render();
+        hideAllViews: function () {
+            return _.select(
+                _.map(this.views, function(v) { return v.hide(); }), 
+                function (t) { return t != null });
         },
 
-        item: function(id) {
-            var product = this._products.getByCid(id);
-            if (_.isUndefined(product._view)) {
-                product._view = new ProductView({model: product,
-                                                 cart: this._cart});
-            }
-            product._view.render();
+        index: function() {
+            var view = this.views['_index'];
+            $.when(this.hideAllViews()).then(
+                function() { return view.show(); });
+        },
+
+        product: function(id) {
+            var product, v, view;
+            product = this.products.detect(function(p) { return p.get('id') == (id); })
+            view = ((v = this.views)['item.' + id]) || (v['item.' + id] = (
+                new ProductView({model: product, 
+                                 itemcollection: this.cart}).render()));
+            $.when(this.hideAllViews()).then(
+                function() { view.show(); });
         }
     });
 
-
     $(document).ready(function() {
-        var fetch_items = function() {
-            return $.ajax({
-                url: 'data/items.json',
-                data: {},
-                contentType: "application/json; charset=utf-8",
-                dataType: "json"
-            });
-        };
-
-        $.when(fetch_items()).then(function(data) {
-            new BackboneStore(data);
-            Backbone.history.start();
-        });
+        new BackboneStore();
+        Backbone.history.start();
     });
-
 }).call(this);
