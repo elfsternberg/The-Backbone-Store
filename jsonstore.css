@@ -1,22 +1,18 @@
-/******************************************************
- *  json store                 *
-\*****************************************************/
 body {
   font-family: "Lucida Grande", Lucida, Helvetica, Arial, sans-serif;
-  background: #FFF;
+  background: #fff;
   color: #333;
   margin: 0px;
   padding: 0px;
 }
-
 #header {
-  background: #C97E41;
+  background: #c97e41;
   margin: 0px;
   padding: 20px;
 }
 #header h1 {
   font-family: Inconsolata, Monaco, Courier, mono;
-  color: #FFF;
+  color: #fff;
   margin: 0px;
 }
 #header .cart-info {
@@ -26,21 +22,32 @@ body {
   text-align: right;
   padding: 10px;
   background: #714625;
-  color: #FFF;
+  color: #fff;
   font-size: 12px;
   font-weight: bold;
 }
 img {
   border: 0;
 }
-
 .item {
-  float:left;
+  float: left;
   width: 250px;
   margin-right: 3px;
   padding: 2px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-left-radius: 5px;
   border: 1px solid #ccc;
-  text-align:center;
+  text-align: center;
   font-size: 12px;
 }
 .item-title {
@@ -51,7 +58,7 @@ img {
   font-size: 14px;
 }
 .item-detail .item-image {
-  float:left;
+  float: left;
 }
 .item-detail .item-info {
   padding: 100px 10px 0px 10px;

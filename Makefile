@@ -29,6 +29,16 @@ all: index.html store.js
 	rm $*.nw-js-tmp; \
 	fi	
 
+jsonstore.styl: backbonestore.nw
+	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
+	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-styl-tmp
+	@ if [ -s "$*.nw-styl-tmp" ]; then \
+		mv $*.nw-styl-tmp $@; \
+	else \
+		echo "$@ not found in $<"; \
+	rm $*.nw-styl-tmp; \
+	fi	
+
 store.js: backbonestore.nw
 	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
 	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-html-tmp
