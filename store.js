@@ -16,12 +16,18 @@
 
     var Item = Backbone.Model.extend({
         update: function(amount) {
-            this.set({'quantity': this.get('quantity') + amount});
+            this.set({'quantity': amount}, {silent: true});
+            this.collection.trigger('change', this);
+        },
+        price: function() {
+            console.log(this.get('product').get('title'), this.get('quantity'));
+            return this.get('product').get('price') * this.get('quantity');
         }
     });
 
     var ItemCollection = Backbone.Collection.extend({
         model: Item,
+
         getOrCreateItemForProduct: function(product) {
             var i, 
             pid = product.get('id'),
@@ -35,17 +41,18 @@
             this.add(i, {silent: true})
             return i;
         },
+
         getTotalCount: function() {
             return this.reduce(function(memo, obj) { 
                 return obj.get('quantity') + memo; }, 0);
         },
+
         getTotalCost: function() {
             return this.reduce(function(memo, obj) { 
-                return (obj.get('product').get('price') * 
-                        obj.get('quantity')) + memo; }, 0);
-
+                return obj.price() + memo; }, 0);
         }
     });
+
 
     var _BaseView = Backbone.View.extend({
         parent: $('#main'),
@@ -63,9 +70,8 @@
                 return null;
             }
             promise = $.Deferred(_.bind(function(dfd) { 
-                this.el.fadeOut('fast', dfd.resolve)}, this)).promise();
-            this.trigger('hide', this);
-            return promise;
+                this.el.fadeOut('fast', dfd.resolve)}, this));
+            return promise.promise();
         },
 
         show: function() {
@@ -73,12 +79,11 @@
                 return;
             }       
             promise = $.Deferred(_.bind(function(dfd) { 
-                this.el.fadeIn('fast', dfd.resolve) }, this)).promise();
-
-            this.trigger('show', this);
-            return promise;
+                this.el.fadeIn('fast', dfd.resolve) }, this))
+            return promise.promise();
         }
     });
+
 
     var ProductListView = _BaseView.extend({
         id: 'productlistview',
@@ -95,6 +100,7 @@
             return this;
         }
     });
+
 
     var ProductView = _BaseView.extend({
         id: 'productitemview',
@@ -113,7 +119,7 @@
 
         update: function(e) {
             e.preventDefault();
-            this.item.update(parseInt($('.uqf').val()));
+            this.item.update(parseInt(this.$('.uqf').val()));
         },
         
         updateOnEnter: function(e) {
@@ -128,6 +134,7 @@
         }
     });
 
+
     var CartWidget = Backbone.View.extend({
         el: $('.cart-info'),
         template: $('#store_cart_template').html(),
@@ -137,7 +144,6 @@
         },
         
         render: function() {
-            console.log(arguments);
             this.el.html(
                 _.template(this.template, {
                     'count': this.collection.getTotalCount(),
@@ -146,6 +152,7 @@
                 .animate({paddingTop: '10px'});
         }
     });
+
 
     var BackboneStore = Backbone.Router.extend({
         views: {},
@@ -200,4 +207,5 @@
         new BackboneStore();
         Backbone.history.start();
     });
+
 }).call(this);

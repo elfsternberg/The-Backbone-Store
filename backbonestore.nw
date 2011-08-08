@@ -137,16 +137,18 @@ product, but a reference to the products and a quantity.
 One thing we will be doing is changing the quantity, so I have
 provided a convenience function for the Item that allows you to do
 that.  Now, no client classes such as Views need to know how the
-quantity is updated.
+quantity is updated.  
 
 Also, it would be nice to know the total price of the Item.
 
 <<cart models>>=
     var Item = Backbone.Model.extend({
         update: function(amount) {
-            this.set({'quantity': amount});
+            this.set({'quantity': amount}, {silent: true});
+            this.collection.trigger('change', this);
         },
         price: function() {
+            console.log(this.get('product').get('title'), this.get('quantity'));
             return this.get('product').get('price') * this.get('quantity');
         }
     });
@@ -236,7 +238,7 @@ and remove tabs from the top of the viewport as needed.
 
 <<base view>>=
     var _BaseView = Backbone.View.extend({
-        parent: '#main',
+        parent: $('#main'),
         className: 'viewport',
 
 @ 
@@ -313,8 +315,8 @@ for our one-page application:
         </title>
         <link rel="stylesheet" href="jsonstore.css" type="text/css">
         <<product list template>>
-        <<product template>>
-        <<checkout template>>
+        <<product detail template>>
+        <<cart template>>
     </head>
     <body>
         <div id="container">
@@ -388,23 +390,23 @@ you should understand this fairly easily.
 And here is the HTML:
 
 <<product list template>>=
-    <script id="store_index_template" type="text/x-underscore-tmplate">
-      <h1>Product Catalog</h1>
-      <ul>
-        <% for(i=0,l=products.length;i<l;++i) { p = products[i]; %>
-        <li class="item">
-          <div class="item-image">
-            <a href="#item/<%= p.id %>">
-              <img alt="<%= p.title %>" src="<%= p.image %>" />
-            </a>
-          </div>
-        </li>
-        <div class="item-artist"><%= p.artist %></div>
-        <div class="item-title"><%= p.title %></div>
-        <div class="item-price">$<%= p.price %></div>
-        <% } %>
-      </ul>
-    </script>
+<script id="store_index_template" type="text/x-underscore-tmplate">
+  <h1>Product Catalog</h1>
+  <ul>
+    <% for(i=0,l=products.length;i<l;++i) { p = products[i]; %>
+    <li class="item">
+      <div class="item-image">
+        <a href="#item/<%= p.id %>">
+          <img alt="<%= p.title %>" src="<%= p.image %>" />
+        </a>
+      </div>
+      <div class="item-artist"><%= p.artist %></div>
+      <div class="item-title"><%= p.title %></div>
+      <div class="item-price">$<%= p.price %></div>
+    </li>
+    <% } %>
+  </ul>
+</script>
 @ 
 %$
 
@@ -467,12 +469,20 @@ get its id and so forth.  All of that has been put into the shopping
 cart model, which is where it belongs: \textit{knowledge about items
   and each item's relationship to its collection belongs in the
   collection}.
+
+Look closely at the [[update()]] method.  The reference [[this.\$]] is
+a special Backbone object that limits selectors to objects inside the
+element of the view.  Without it, jQuery would have found the first
+input field of class 'uqf' in the DOM, not the one for this specific
+view.  [[this.\$('.uqf')]] is shorthand for [[$('uqf', this.el)]], and
+helps clarify what it is you're looking for.
+
 %'
 
 <<product detail view>>=
         update: function(e) {
             e.preventDefault();
-            this.item.update(parseInt($('.uqf').val()));
+            this.item.update(parseInt(this.$('.uqf').val()));
         },
         
         updateOnEnter: function(e) {
@@ -499,33 +509,33 @@ The product detail template is fairly straightforward.  There is no
 [[underscore]] magic because there are no loops.
 
 <<product detail template>>=
-    <script id="store_item_template" type="text/x-underscore-template">
-      <div class="item-detail">
-        <div class="item-image">
-          <img alt="<%= title %>" src="<%= large_image %>" />
-        </div>
-      </div>
-      <div class="item-info">
-        <div class="item-artist"><%= artist %></div>
-        <div class="item-title"><%= title %></div>
-        <div class="item-price">$<%= price %></div>
-        <form action="#/cart" method="post">
-          <p>
-            <label>Quantity:</label>
-            <input class="uqf" name="quantity" size="2" type="text" value="1" />
-          </p>
-          <p>
-            <input class="uq" type="submit" value="Add to Cart" />
-          </p>
-        </form>
-        <div class="item-link">
-          <a href="<%= url %>">Buy this item on Amazon</a>
-        </div>
-        <div class="back-link">
-          <a href="#">&laquo; Back to Items</a>
-        </div>
-      </div>
-    </script>
+<script id="store_item_template" type="text/x-underscore-template">
+  <div class="item-detail">
+    <div class="item-image">
+      <img alt="<%= title %>" src="<%= large_image %>" />
+    </div>
+  </div>
+  <div class="item-info">
+    <div class="item-artist"><%= artist %></div>
+    <div class="item-title"><%= title %></div>
+    <div class="item-price">$<%= price %></div>
+    <form action="#/cart" method="post">
+      <p>
+        <label>Quantity:</label>
+        <input class="uqf" name="quantity" size="2" type="text" value="1" />
+      </p>
+      <p>
+        <input class="uq" type="submit" value="Add to Cart" />
+      </p>
+    </form>
+    <div class="item-link">
+      <a href="<%= url %>">Buy this item on Amazon</a>
+    </div>
+    <div class="back-link">
+      <a href="#">&laquo; Back to Items</a>
+    </div>
+  </div>
+</script>
 @ 
 
 So, let's talk about that shopping cart thing.  We've been making the
@@ -570,9 +580,9 @@ show that it did changed:
 And the HTML for the template is dead simple:
 
 <<cart template>>=
-    <script id="store_cart_template" type="text/x-underscore-template">
-      <p>Items: <%= count %> ($<%= cost %>)</p>
-    </script>
+<script id="store_cart_template" type="text/x-underscore-template">
+  <p>Items: <%= count %> ($<%= cost %>)</p>
+</script>
 
 @ 
 %$
@@ -721,6 +731,8 @@ Here's the entirety of the program:
 <<product list view>>
 
 <<product detail view>>
+
+<<cart widget>>
 
 <<router>>
 

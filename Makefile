@@ -39,7 +39,7 @@ store.js: backbonestore.nw
 	rm $*.nw-tmp; \
 	fi	
 
-index.html:
+index.html: backbonestore.nw
 	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
 	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-html-tmp
 	@ if [ -s "$*.nw-html-tmp" ]; then \

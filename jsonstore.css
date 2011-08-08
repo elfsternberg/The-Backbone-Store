@@ -33,12 +33,17 @@ body {
 img {
   border: 0;
 }
+#productlistview ul {
+    list-style: none;
+}
 
 .item {
+  display: border;
   float:left;
   width: 250px;
-  margin-right: 3px;
-  padding: 2px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 10px;
   border: 1px solid #ccc;
   text-align:center;
   font-size: 12px;
