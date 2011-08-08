@@ -8,6 +8,14 @@ operate correctly.  Chrome, especially, will not initialize the
 application from the filesystem.  Just unpack it in a target directory
 of your choosing and then browse to that directory.
 
+## Branches
+
+There are two major development branches for The Backbone Store.
+
+Branch 'master' uses HTML, CSS, and Javascript.
+
+Branch 'modern' uses HAML, Stylus, and Coffee.
+
 ## Copyright
 
 Store.js is entirely my own work, and is Copyright (c) 2010 Elf
