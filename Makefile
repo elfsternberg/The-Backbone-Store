@@ -1,13 +1,31 @@
-.SUFFIXES: .nw .js .pdf .html .tex 
+.SUFFIXES: .nw .js .pdf .html .tex .haml .css .stylus
 
 NOTANGLE=		notangle
 NOWEAVE=		noweave
 ECHO=			/bin/echo
+STYLUS=			stylus
+HAML=			haml
+COFFEE=         coffee
 
-all: index.html store.js 
+all: index.html store.js jsonstore.css
 
-.nw.html:
-	$(NOWEAVE) -filter l2h -delay -x -index -autodefs c -html $*.nw > $*.html
+index.html: index.haml
+	$(HAML) --unix-newlines --no-escape-attrs --double-quote-attribute $*.haml > $*.html
+
+index.haml: backbonestore.nw
+	$(NOTANGLE) -c -R$@ $< > $*.haml
+
+jsonstore.css: jsonstore.styl
+	$(STYLUS) $*.styl
+
+jsonstore.styl: backbonestore.nw
+	$(NOTANGLE) -c -R$@ $< > $@
+
+store.js: store.coffee
+	$(COFFEE) --compile $<
+
+store.coffee: backbonestore.nw
+	$(NOTANGLE) -c -R$@ $< > $@
 
 .nw.tex:
 	$(NOWEAVE) -x -delay $*.nw > $*.tex 			#$
@@ -18,47 +36,6 @@ all: index.html store.js
         do \
 		xelatex *$.tex; \
 	done
-
-.nw.js:
-	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
-	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-js-tmp
-	@ if [ -s "$*.nw-js-tmp" ]; then \
-		mv $*.nw-js-tmp $@; \
-	else \
-		echo "$@ not found in $<"; \
-	rm $*.nw-js-tmp; \
-	fi	
-
-jsonstore.styl: backbonestore.nw
-	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
-	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-styl-tmp
-	@ if [ -s "$*.nw-styl-tmp" ]; then \
-		mv $*.nw-styl-tmp $@; \
-	else \
-		echo "$@ not found in $<"; \
-	rm $*.nw-styl-tmp; \
-	fi	
-
-store.js: backbonestore.nw
-	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
-	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-html-tmp
-	@ if [ -s "$*.nw-html-tmp" ]; then \
-		mv $*.nw-html-tmp $@; \
-	else \
-		echo "$@ not found in $<"; \
-	rm $*.nw-tmp; \
-	fi	
-
-index.html:
-	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
-	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-html-tmp
-	@ if [ -s "$*.nw-html-tmp" ]; then \
-		mv $*.nw-html-tmp $@; \
-	else \
-		echo "$@ not found in $<"; \
-	rm $*.nw-tmp; \
-	fi	
-
 
 clean:
 	- rm -f *.tex *.dvi *.aux *.toc *.log *.out *.html *.js

@@ -13,10 +13,10 @@
               <img alt="<%= p.title %>" src="<%= p.image %>" />
             </a>
           </div>
+          <div class="item-artist"><%= p.artist %></div>
+          <div class="item-title"><%= p.title %></div>
+          <div class="item-price">$<%= p.price %></div>
         </li>
-        <div class="item-artist"><%= p.artist %></div>
-        <div class="item-title"><%= p.title %></div>
-        <div class="item-price">$<%= p.price %></div>
         <% } %>
       </ul>
     </script>
@@ -49,6 +49,7 @@
     <script id="store_cart_template" type="text/x-underscore-template">
       <p>Items: <%= count %> ($<%= cost %>)</p>
     </script>
+    </head>
   </head>
   <body>
     <div id="container">

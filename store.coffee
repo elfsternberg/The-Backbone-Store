@@ -10,10 +10,13 @@ class ProductCollection extends Backbone.Collection
     comparator: (item) ->
         item.get('title')
 
-
 class Item extends Backbone.Model
     update: (amount) ->
-        @set {quantity: @get('quantity') + amount}
+        @set
+            quantity: @get('quantity')
+
+    price: () ->
+        @get('product').get('price') * @get('quantity')
 
 class ItemCollection extends Backbone.Collection
     model: Item
@@ -34,10 +37,9 @@ class ItemCollection extends Backbone.Collection
         @reduce addup, 0
 
     getTotalCost: () ->
-        addup = (memo, obj) ->
-            (obj.get('product').get('price') *
-             obj.get('quantity')) + memo
-        @reduce addup, 0
+        addup = (memo, obj) ->obj.price() + memo
+        @reduce(addup, 0);
+
 
 class _BaseView extends Backbone.View
     parent: $('#main')
@@ -52,11 +54,7 @@ class _BaseView extends Backbone.View
     hide: () ->
         if not @el.is(':visible')
             return null
-
-        # Make a note here about how the => operator replaces the need for
-        # _.bind()
         promise = $.Deferred (dfd) => @el.fadeOut('fast', dfd.resolve)
-        @trigger 'hide', @
         promise.promise()
 
     show: () ->
@@ -64,7 +62,6 @@ class _BaseView extends Backbone.View
             return
 
         promise = $.Deferred (dfd) => @el.fadeIn('fast', dfd.resolve)
-        @trigger 'show', @
         promise.promise()
 
 
@@ -79,6 +76,7 @@ class ProductListView extends _BaseView
     render: () ->
         @el.html(_.template(@template, {'products': @collection.toJSON()}))
         @
+
 
 class ProductView extends _BaseView
     id: 'productitemview'
@@ -95,7 +93,7 @@ class ProductView extends _BaseView
 
     update: (e) ->
         e.preventDefault()
-        @item.update parseInt($('.uqf').val())
+        @item.update parseInt(@$('.uqf').val())
 
     updateOnEnter: (e) ->
         if (e.keyCode == 13)
@@ -104,6 +102,7 @@ class ProductView extends _BaseView
     render: () ->
         @el.html(_.template(@template, @model.toJSON()));
         @
+
 
 class CartWidget extends Backbone.View
     el: $('.cart-info')
@@ -118,6 +117,7 @@ class CartWidget extends Backbone.View
             'cost': @collection.getTotalCost()
         tel.animate({paddingTop: '30px'}).animate({paddingTop: '10px'})
         @
+
 
 class BackboneStore extends Backbone.Router
     views: {}
@@ -146,6 +146,7 @@ class BackboneStore extends Backbone.Router
         _.select(_.map(@views, (v) -> return v.hide()),
             (t) -> t != null)
 
+
     index: () ->
         view = @views['_index']
         $.when(@hideAllViews()).then(() -> view.show())
@@ -158,6 +159,7 @@ class BackboneStore extends Backbone.Router
         ).render())
         $.when(@hideAllViews()).then(
             () -> view.show())
+
 
 $(document).ready () ->
     new BackboneStore();

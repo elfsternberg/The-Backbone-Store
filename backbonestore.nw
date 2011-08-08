@@ -319,7 +319,7 @@ Before we move on, let's take a look at the HAML we're going to use
 for our one-page application.  The code below compiles beautifully
 into the same HTML seen in the original Backbone Store.
 
-<<index.html>>=
+<<index.haml>>=
 !!! 5
 %html{:xmlns => "http://www.w3.org/1999/xhtml"}
   %head
@@ -688,7 +688,7 @@ $(document).ready () ->
 Here's the entirety of the program.  Coffeescript provides its own
 namespace wrapper:
 
-<<store.js>>=
+<<store.coffee>>=
 <<product models>>
 
 <<cart models>>
@@ -779,11 +779,16 @@ body
 img
   border: 0
 
+#productlistview
+  ul
+    list-style: none
+
 .item
   float:left
   width: 250px
-  margin-right: 3px
-  padding: 2px
+  margin-right: 10px
+  margin-bottom: 10px
+  padding: 5px
   rounded(5px)
   border: 1px solid #ccc
   text-align:center
