@@ -12,8 +12,10 @@ class ProductCollection extends Backbone.Collection
 
 class Item extends Backbone.Model
     update: (amount) ->
-        @set
-            quantity: @get('quantity')
+        if amount == @get('quantity')
+            return
+        @set {quantity: amount}, {silent: true}
+        @collection.trigger('change', this)
 
     price: () ->
         @get('product').get('price') * @get('quantity')

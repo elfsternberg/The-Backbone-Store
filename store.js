@@ -36,9 +36,15 @@
       Item.__super__.constructor.apply(this, arguments);
     }
     Item.prototype.update = function(amount) {
-      return this.set({
-        quantity: this.get('quantity')
+      if (amount === this.get('quantity')) {
+        return;
+      }
+      this.set({
+        quantity: amount
+      }, {
+        silent: true
       });
+      return this.collection.trigger('change', this);
     };
     Item.prototype.price = function() {
       return this.get('product').get('price') * this.get('quantity');

@@ -169,8 +169,10 @@ Also, it would be nice to know the total price of the Item.
 <<cart models>>=
 class Item extends Backbone.Model
     update: (amount) ->
-        @set
-            quantity: @get('quantity')
+        if amount == @get('quantity')
+            return
+        @set {quantity: amount}, {silent: true}
+        @collection.trigger('change', this)
 
     price: () ->
         @get('product').get('price') * @get('quantity')
@@ -499,24 +501,24 @@ The product detail template is fairly straightforward.  There is no
 <<product detail template>>=
 %script#store_item_template(type= "text/x-underscore-template")
   .item-detail
-  .item-image
-    %img(src="<%= large_image %>" alt="<%= title %>")/
-  .item-info
-  .item-artist <%= artist %>
-  .item-title <%= title %>
-  .item-price $<%= price %>
-  .item-form
-  %form(action="#/cart" method="post")
-    %p
-      %label Quantity:
-      %input(type="text" size="2" name="quantity" value="1" class="uqf")/
-    %p
-      %input(type="submit" value="Add to Cart" class="uq")/
+    .item-image
+      %img(src="<%= large_image %>" alt="<%= title %>")/
+    .item-info
+      .item-artist <%= artist %>
+      .item-title <%= title %>
+      .item-price $<%= price %>
+      .item-form
+      %form(action="#/cart" method="post")
+        %p
+          %label Quantity:
+          %input(type="text" size="2" name="quantity" value="1" class="uqf")/
+        %p
+          %input(type="submit" value="Add to Cart" class="uq")/
 
-  .item-link
-    %a(href="<%= url %>") Buy this item on Amazon
-  .back-link
-    %a(href="#") &laquo; Back to Items
+      .item-link
+        %a(href="<%= url %>") Buy this item on Amazon
+      .back-link
+        %a(href="#") &laquo; Back to Items
 @
 
 So, let's talk about that shopping cart thing.  We've been making the
@@ -735,6 +737,11 @@ rounded(radius)
   border-top-right-radius: radius
   border-bottom-left-radius: radius
 
+background_gradient(base)
+  background: base
+  background: -webkit-gradient(linear, left top, left bottom, from(lighten(base, 20%)), to(darken(base, 20%)))
+  background: -moz-linear-gradient(top,  lighten(base, 20%), darken(base, 20%))
+
 @
 
 And if you look down below you'll see the [[rounded()]] function
@@ -756,9 +763,10 @@ body
 
 
 #header
-  background: #C97E41
+  background_gradient(#999)
   margin: 0px
   padding: 20px
+  border-bottom: 1px solid #ccc
 
   h1
     font-family: Inconsolata, Monaco, Courier, mono
@@ -771,7 +779,7 @@ body
     right: 0px
     text-align: right
     padding: 10px
-    background: #714625
+    background_gradient(#555)
     color: #FFF
     font-size: 12px
     font-weight: bold
@@ -802,9 +810,11 @@ img
   font-size: 14px
 
 .item-detail
+  margin: 10px 0 0 10px
 
   .item-image
     float:left
+    margin-right: 10px
 
   .item-info
     padding: 100px 10px 0px 10px

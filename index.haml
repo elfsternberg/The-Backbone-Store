@@ -18,24 +18,24 @@
 
     %script#store_item_template(type= "text/x-underscore-template")
       .item-detail
-      .item-image
-        %img(src="<%= large_image %>" alt="<%= title %>")/
-      .item-info
-      .item-artist <%= artist %>
-      .item-title <%= title %>
-      .item-price $<%= price %>
-      .item-form
-      %form(action="#/cart" method="post")
-        %p
-          %label Quantity:
-          %input(type="text" size="2" name="quantity" value="1" class="uqf")/
-        %p
-          %input(type="submit" value="Add to Cart" class="uq")/
+        .item-image
+          %img(src="<%= large_image %>" alt="<%= title %>")/
+        .item-info
+          .item-artist <%= artist %>
+          .item-title <%= title %>
+          .item-price $<%= price %>
+          .item-form
+          %form(action="#/cart" method="post")
+            %p
+              %label Quantity:
+              %input(type="text" size="2" name="quantity" value="1" class="uqf")/
+            %p
+              %input(type="submit" value="Add to Cart" class="uq")/
 
-      .item-link
-        %a(href="<%= url %>") Buy this item on Amazon
-      .back-link
-        %a(href="#") &laquo; Back to Items
+          .item-link
+            %a(href="<%= url %>") Buy this item on Amazon
+          .back-link
+            %a(href="#") &laquo; Back to Items
     %script#store_cart_template(type="text/x-underscore-template")
       %p Items: <%= count %> ($<%= cost %>)
 
