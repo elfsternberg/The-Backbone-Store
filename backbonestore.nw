@@ -47,11 +47,11 @@ A note: this article was written with the
 \nwanchorto{http://en.wikipedia.org/wiki/Literate_programming}{Literate
   Programming} toolkit
 \nwanchorto{http://www.cs.tufts.edu/~nr/noweb/}{Noweb}. Where you see
-something that looks like \textless \textless this \textgreater \textgreater, it's a placeholder for code
+something that looks like \\<\\<this\\>\\>, it's a placeholder for code
 described elsewhere in the document.  Placeholders with an equal sign
 at the end of them indicate the place where that code is defined.  The
-link (U-\textgreater) indicates that the code you're seeing is used later in the
-document, and (\textless-U) indicates it was used earlier but is being defined
+link (U->) indicates that the code you're seeing is used later in the
+document, and (<-U) indicates it was used earlier but is being defined
 here.
 
 \subsection{Revision}
@@ -250,7 +250,7 @@ be rendered.  The second defines a common class we will use for the
 purpose of identifying these views to jQuery.  Backbone automatically
 creates a new [[DIV]] object with the class 'viewport' when a view
 constructor is called.  It will be our job to attach that [[DIV]] to
-the DOM.  In the HTML, you will see the [[DIV#main]] object where most
+the DOM.  In the HTML, you will see the [[DIV\#main]] object where most
 of the work will be rendered.
 
 <<base view>>=
@@ -265,7 +265,7 @@ of the work will be rendered.
 %$
 
 The method above ensures that the element is rendered, but not
-visible, and contained within the [[DIV#main]].  Note also that
+visible, and contained within the [[DIV\#main]].  Note also that
 the element is not a sacrosanct object; the Backbone.View is more a
 collection of standards than a mechanism of enforcement, and so
 defining it from a raw DOM object to a jQuery object will not break
@@ -340,8 +340,8 @@ for our one-page application:
 @ 
 
 It's not much to look at, but already you can see where that
-[[DIV#main]] goes, as well as where we are putting our templates.
-The [[DIV#main]] will host a number of viewports, only one of
+[[DIV\#main]] goes, as well as where we are putting our templates.
+The [[DIV\#main]] will host a number of viewports, only one of
 which will be visible at any given time.
 
 Our first view is going to be the product list view, named, well,
@@ -413,8 +413,8 @@ And here is the HTML:
 
 One of the most complicated objects in our ecosystem is the product
 view.  It actually does something!  The prefix ought to be familiar,
-but note that we are again using [[#main]] as our target; we will be
-showing and hiding the various [[DIV]] objects in [[#main]] again and
+but note that we are again using [[\#main]] as our target; we will be
+showing and hiding the various [[DIV]] objects in [[\#main]] again and
 again.
 
 The only trickiness here is twofold: the (rather hideous) means by
@@ -590,7 +590,7 @@ And the HTML for the template is dead simple:
 Lastly, there is the [[Router]].  In Backbone, the Router is a
 specialized View for invoking other views.  It listens for one
 specific event: when the [[window.location.hash]] object, the part of
-the URL after the '#' symbol, changes.  When the hash changes, the
+the URL after the hash symbol, changes.  When the hash changes, the
 Router invokes an event handler.  The Router, since its purpose is to
 control the major components of the one-page display, is also a good
 place to keep all the major components of the sytem.  We'll keep track
@@ -648,7 +648,7 @@ returns the result of an [[ajax()]] call, which is a deferred.
 %$
 
 There are two things to route \textit{to}, but we must also route
-\textif{from}.  Remember that our two major views, the product list
+\textit{from}.  Remember that our two major views, the product list
 and the product detail, inherited from [[\_BaseView]], which has the
 [[hide()]] and [[show()]] methods.  We want to hide all the views,
 then show the one invoked.  First, let's hide every view we know
