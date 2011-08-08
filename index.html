@@ -3,6 +3,7 @@
   <head>
     <title>The Backbone Store</title>
     <link charset="utf-8" href="jsonstore.css" rel="stylesheet" type="text/css" />
+
     <script id="store_index_template" type="text/x-underscore-tmplate">
       <h1>Product Catalog</h1>
       <ul>
@@ -20,6 +21,7 @@
         <% } %>
       </ul>
     </script>
+
     <script id="store_item_template" type="text/x-underscore-template">
       <div class="item-detail"></div>
       <div class="item-image">
@@ -46,10 +48,13 @@
         <a href="#">&laquo; Back to Items</a>
       </div>
     </script>
+
     <script id="store_cart_template" type="text/x-underscore-template">
       <p>Items: <%= count %> ($<%= cost %>)</p>
     </script>
+
   </head>
+
   <body>
     <div id="container">
       <div id="header">
