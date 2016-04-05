@@ -7,8 +7,15 @@ ECHO=			/bin/echo
 all: index.html store.js 
 
 init:
+	mkdir -p thestore/lib
 	bower install jquery backbone underscore
+	cp bower_components/backbone/backbone.js thestore/lib
+	cp bower_components/jquery/dist/jquery.js thestore/lib
+	cp bower_components/underscore/underscore.js thestore/lib
 	npm install
+
+serve:
+	./node_modules/.bin/http-server thestore/
 
 .nw.html:
 	$(NOWEAVE) -filter l2h -delay -x -index -autodefs c -html $*.nw > $*.html
@@ -59,4 +66,5 @@ clean:
 
 realclean: clean
 	- rm -f *.pdf
+	- rm -fr bower_components node_modules thestore/lib 
 

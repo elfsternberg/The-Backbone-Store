@@ -3,6 +3,7 @@
 *#
 .#*
 .DS_Store
-./thestore/lib
+thestore/lib
+bower_components
 node_modules
 *~
