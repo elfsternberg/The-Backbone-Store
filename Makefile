@@ -6,6 +6,10 @@ ECHO=			/bin/echo
 
 all: index.html store.js 
 
+init:
+	bower install jquery backbone underscore
+	npm install
+
 .nw.html:
 	$(NOWEAVE) -filter l2h -delay -x -index -autodefs c -html $*.nw > $*.html
 

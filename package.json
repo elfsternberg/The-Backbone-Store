@@ -1,0 +1,28 @@
+{
+  "name": "the-backbone-store",
+  "version": "1.0.0",
+  "description": "A Backbone Tutorial",
+  "main": "backbone.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/elfsternberg/The-Backbone-Store.git"
+  },
+  "keywords": [
+    "tutorial",
+    "backbone",
+    "jquery"
+  ],
+  "devDependencies": {
+      "coffee-script": "1.6.x",
+      "http-server": "0.9.x"
+  },
+  "author": "Elf M. Sternberg <elf.sternberg@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elfsternberg/The-Backbone-Store/issues"
+  },
+  "homepage": "https://github.com/elfsternberg/The-Backbone-Store#readme"
+}

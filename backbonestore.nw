@@ -1,4 +1,4 @@
-% -*- Mode: noweb; noweb-code-mode: javascript-mode ; noweb-doc-mode: latex-mode -*-
+% -*- Mode: poly-noweb+coffee; -*-
 \documentclass{article}
 \usepackage{noweb}
 \usepackage[T1]{fontenc}

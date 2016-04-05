@@ -3,4 +3,6 @@
 *#
 .#*
 .DS_Store
+./thestore/lib
+node_modules
 *~
