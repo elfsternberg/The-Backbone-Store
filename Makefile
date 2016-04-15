@@ -10,7 +10,10 @@ COFFEE=         ./node_modules/coffee-script/bin/coffee
 LIBS:= htdocs/lib/underscore.js htdocs/lib/jquery.js htdocs/lib/backbone.js
 
 all: htdocs/index.html htdocs/store.js htdocs/jsonstore.css htdocs/data/items.json
-	@if [ ! -e "./htdocs/lib" ]; then echo "Please do 'make setup' before continuing"; fi
+	@if [ ! -e "./htdocs/lib" ]; then \
+		echo "Please do 'make setup' before continuing"; \
+		exit 1; \
+	fi
 
 serve: all
 	$(COFFEE) ./bin/autoreload
@@ -70,9 +73,13 @@ work/store.coffee: work src/backbonestore.nw
 	done
 
 clean:
-	- rm -f docs/*.tex docs/*.dvi docs/*.aux docs/*.toc docs/*.log docs/*.out htdocs/*.html htdocs/*.js htdocs/*.css
+	- rm -f htdocs/*.* docs/*.tex docs/*.dvi docs/*.aux docs/*.toc docs/*.log docs/*.out
+	- rm -fr ./work
 
-realclean: clean
-	- rm -f docs/*.pdf
-	- rm -fr work htdocs
+distclean: clean
+	- rm -fr ./htdocs/lib		
+
+realclean: distclean
+	- rm -fr docs
+
 

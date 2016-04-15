@@ -10,3 +10,4 @@ npm-debug.log
 work/*
 htdocs/*.*
 htdocs/lib
+package.yml
