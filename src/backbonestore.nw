@@ -391,7 +391,7 @@ class ProductListView extends _BaseView
         @collection.bind 'reset', _.bind(@render, @)
 
     render: () ->
-        @el.html(_.template(@template, {'products': @collection.toJSON()}))
+        @el.html(_.template(@template)({'products': @collection.toJSON()}))
         @
 
 @
@@ -442,7 +442,6 @@ class ProductView extends _BaseView
     initialize: (options) ->
         _BaseView.prototype.initialize.apply @, [options]
         @itemcollection = options.itemcollection
-        @item = @itemcollection.getOrCreateItemForProduct @model
         
 @
 %$
@@ -491,11 +490,10 @@ helps clarify what it is you're looking for.
 <<product detail view>>=
     update: (e) ->
         e.preventDefault()
-        @item.update parseInt(@$('.uqf').val())
+        @itemcollection.update @model, parseInt(@$('.uqf').val())
 
     updateOnEnter: (e) ->
-        if (e.keyCode == 13)
-            @update e
+        @update(e) if e.keyCode == 13
 
 @
 %$
@@ -504,7 +502,7 @@ The render is straightforward:
 
 <<product detail view>>=
     render: () ->
-        @el.html(_.template(@template, @model.toJSON()));
+        @el.html(_.template(@template)(@model.toJSON()));
         @
 
 @
@@ -562,9 +560,10 @@ show that it did changed:
 
 <<cart widget>>=
     render: () ->
-        tel = @el.html _.template @template,
+        tel = @el.html _.template(@template)({
             'count': @collection.getTotalCount()
             'cost': @collection.getTotalCost()
+        })
         tel.animate({paddingTop: '30px'}).animate({paddingTop: '10px'})
         @
 

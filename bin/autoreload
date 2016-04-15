@@ -1,4 +1,4 @@
-#!/usr/bin/env coffee
+#!/bin/env coffee
 
 fs = require 'fs'
 Inotify = require('inotify').Inotify
@@ -13,7 +13,7 @@ monitor = new Inotify()
 
 reBuild = ->
   maker = spawn 'make', ['store']
-  make.stdout.on 'data', spew
+  maker.stdout.on 'data', spew
 
 monitor.addWatch
     path: "./src/backbonestore.nw"

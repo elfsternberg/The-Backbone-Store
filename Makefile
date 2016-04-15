@@ -1,4 +1,4 @@
-.PHONY: setup store
+.PHONY: setup store serve
 
 NOTANGLE=		notangle
 NOWEAVE=		noweave
@@ -11,6 +11,11 @@ LIBS:= htdocs/lib/underscore.js htdocs/lib/jquery.js htdocs/lib/backbone.js
 
 all: htdocs/index.html htdocs/store.js htdocs/jsonstore.css htdocs/data/items.json
 	@if [ ! -e "./htdocs/lib" ]; then echo "Please do 'make setup' before continuing"; fi
+
+serve: all
+	$(COFFEE) ./bin/autoreload
+
+store: all
 
 htdocs/lib:
 	mkdir -p htdocs/lib
