@@ -1,0 +1,21 @@
+#!/usr/bin/env coffee
+
+fs = require 'fs'
+Inotify = require('inotify').Inotify
+spawn = require('child_process').spawn
+
+spew = (data) -> console.log data.toString 'utf8'
+
+server = spawn './node_modules/http-server/bin/http-server', ['./htdocs/']
+server.stdout.on 'data', spew
+
+monitor = new Inotify()
+
+reBuild = ->
+  maker = spawn 'make', ['store']
+  make.stdout.on 'data', spew
+
+monitor.addWatch
+    path: "./src/backbonestore.nw"
+    watch_for: Inotify.IN_CLOSE_WRITE
+    callback: reBuild

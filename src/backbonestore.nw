@@ -1,8 +1,10 @@
-% -*- Mode: noweb; noweb-code-mode: coffee-mode ; noweb-doc-mode: latex-mode -*-
+% -*- Mode: poly-noweb+coffee -*-
 \documentclass{article}
 \usepackage{noweb}
 \usepackage[T1]{fontenc}
 \usepackage{hyperref}
+\usepackage{fontspec, xunicode, xltxtra}
+\setromanfont{Georgia}
 \begin{document}
 
 % Generate code and documentation with:
@@ -13,39 +15,47 @@
 
 \section{Introduction}
 
-This is version 2.0\textit{bis} of \textbf{The Backbone Store}, a
-brief tutorial on using [[backbone.js]].  It uses the original
-Backbone Store as a reference, but using a modern suite of tools:
-Coffeescript (version 1.1), HAML (Ruby version 3.1.1), and Stylus.
+This is version 3.0 of \textbf{The Backbone Store}, a brief tutorial on
+using [[backbone.js]].  The version you are currently reading has been
+tested with the latest versions of the supporting software as of April,
+2016.
 
-\nwanchorto{http://jashkenas.github.com/coffee-script/}{CoffeeScript}
-is a lovely little languange that compiles into Javascript.  It
-provides a class-based architecture (that is compatible with
-Backbone), has an elegant structure for defining functions and
-methods, and strips out as much extraneous punctuation as possible.
-Some people find the whitespace-as-semantics a'la Python offputting,
-but most disciplined developers already indent appropriately.
+\nwanchorto{http://documentcloud.github.com/backbone/}{Backbone.js} is a
+popular Model-View-Controller (MVC) library that provides a framework
+for creating data-rich, single-page web applications.  It provides (1) a
+two-layer scheme for separating data from presentation, (2) a means of
+automatically synchronizing data with a server in a RESTful manner, and
+(3) a mechanism for making some views bookmarkable and navigable.
+
+Backbone is dependent upon \nwanchorto{http://jquery.com}{jQuery} and
+\nwanchorto{http://underscorejs.org}{Underscore}.  Both of those
+dependencies are encoded into the build process automatically.
+
+The version of this tutorial you are currently reading uses
+Coffeescript, Stylus, and Ruby's HAML.  The purpose of this tutorial is
+to show how to use Backbone in a modern, constrained programming
+environment.
+
+\nwanchorto{http://jashkenas.github.com/coffee-script/}{CoffeeScript} is
+a lovely little languange that compiles into Javascript.  It provides a
+class-based architecture (that is compatible with Backbone), has an
+elegant structure for defining functions and methods, and strips out as
+much extraneous punctuation as possible.  Some people find the
+whitespace-as-semantics a'la Python offputting, but most disciplined
+developers already indent appropriately anyway.
 
 \nwanchorto{http://haml-lang.com/}{HAML} is a languange that compiles
 into HTML.  Like CoffeeScript, it uses whitespace for semantics:
-indentation levels correspond to HTML containerizations.  It allows
-you to use rich scripting while preventing heirarchy misplacement
-mistakes.  Its shorthand also makes writing HTML much faster.
+indentation levels correspond to HTML containerizations.  It allows you
+to use rich scripting while preventing heirarchy misplacement mistakes.
+Its shorthand also makes writing HTML much faster.
 
-\nwanchorto{https://github.com/LearnBoost/stylus/}{Stylus} is
-languange that compiles into CSS.  Like CoffeeScript and HAML, it uses
-whitespace for semantics.  It also provides mixins and functions that
-allow you to define visual styles such as borders and gradients, and
-mix them into specific selectors in the CSS rather than having to
-write them into the HTML.
-
-\nwanchorto{http://documentcloud.github.com/backbone/}{Backbone.js} is
-a popular Model-View-Controller (MVC) library that provides a
-framework for creating data-rich, single-page web applications.  It
-provides (1) a two-layer scheme for separating data from presentation,
-(2) a means of automatically synchronizing data with a server in a
-RESTful manner, and (3) a mechanism for making some views bookmarkable
-and navigable.
+\nwanchorto{https://github.com/LearnBoost/stylus/}{Stylus} is languange
+that compiles into CSS.  Like CoffeeScript and HAML, it uses whitespace
+for semantics.  It also provides mixins and functions that allow you to
+define visual styles such as borders and gradients, and mix them into
+specific selectors in the CSS rather than having to write them into the
+HTML.
 
 There are a number of other good tutorials for Backbone (See:
 \nwanchorto{http://www.plexical.com/blog/2010/11/18/backbone-js-tutorial/}{Meta
@@ -56,7 +66,7 @@ There are a number of other good tutorials for Backbone (See:
   Mobile} (which is written in
 \nwanchorto{http://jashkenas.github.com/coffee-script/}{Coffee}), and
 \nwanchorto{http://joshbohde.com/2010/11/25/backbonejs-and-django/}{Backbone
-  and Django}.  However, a couple of months ago I was attempting to
+  and Django}.  However, a couple of years ago I was attempting to
 learn Sammy.js, a library very similar to Backbone, and they had a
 nifty tutorial called
 \nwanchorto{http://code.quirkey.com/sammy/tutorials/json_store_part1.html}{The
@@ -79,151 +89,154 @@ here.
 
 \subsection{Revision}
 
-This is version 2.0 of \textit{The Backbone Store}.  It includes
-changes to the store based upon a better understanding of what
-Backbone.js can do.  This version uses jQuery 1.6.2 and Backbone
-0.5.2.
+This is version 3.0 of \textit{The Backbone Store}.  It includes several
+significant updates, including the use of both NPM and Bower to build
+the final application.
 
-\subsection{The Store}
+\subsection{The Store: What We're Going to Build}
 
 To demonstrate the basics of Backbone, I'm going to create a simple
-one-page application, a store for record albums, with two unique
-views: a list of all products and a product detail view.  I will also
-put a shopping cart widget on the page that shows the user how many
-products he or she has dropped into the cart.  I'll use jQuery's
-[[fadeIn()]] and [[fadeOut()]] features to transition between the
-catalog and the product detail pages.
+one-page application, a store for record albums, with two unique views:
+a list of all products and a product detail view.  I will also put a
+shopping cart widget on the page that shows the user how many products
+he or she has dropped into the cart.  I'll use some simple animations to
+transition between the catalog and the product detail pages.
 
 \subsection{Models, Collections, and Controllers}
 
-Backbone's data layer provides two classes, [[Model]] and
-[[Collection]].  To use the Model, you inherit from it, modify the
-subclasss as needed, and then create new objects from the subclass by
-constructing the model with a JSON object.  You modify the object by
-calling [[get()]] or [[set()]] on named attributes, rather than on the
-Model object directly; this allows Model to notify other interested
-objects that the object has been changed.  And Model comes with
-[[fetch()]] and [[save()]] methods that will automatically pull or
-push a JSON representatino of the model to a server, if the Model has
-[[url]] as one of its attributes.
+Backbone's data layer provides two classes, [[Collection]] and
+[[Model]].
 
-Collections are just that: lists of objects of a specific model.  You
-extend the Collection class in a child class, and as you do you inform
-the Collection of what Model it represents, what URL you use to
-push/pull the full list of objects, and on what field the list should
-be sorted by default.  If you attempt to add a raw JSON object to a
-collection, it constructs a corresponding Model object out of the JSON
-and manipulates that.
+Every web application has data, often tabular data. Full-stack web
+developers are (or ought to be) familiar with the \textit{triples} of
+addressing objects on the web: Table URL → Row → Field, or Page URL →
+HTML Node → Content.  The [[Collection]] object represents just that: a
+collection of similar items.  The [[Model]] represents exactly one of
+those items.  
 
-I will be getting the data from a simplified JSON file that comes in
-the download; it contains six record albums that the store sells.
-(Unlike the JSON store, these albums do not exist; the covers were
-generated during a round of
-\nwanchorto{http://elfs.livejournal.com/756709.html}{The Album Cover
-  Game}, a meme one popular with graphic designers.)
+To use the Model, you inherit from it using Backbone's own [[.extend()]]
+class method, adding or replacing methods in the child object as
+needed.  For our purposes, we have two models: [[Product]] represents
+something we wish to sell, and [[Item]] represents something currently
+in the customer's shopping cart.  
 
-For our purposes, then, we have a [[Product]] and a
-[[ProductCollection]].  A popular convention in Backbone is to use
-concrete names for models, and Name\textbf{Collection} for the
-collection.
+Shopping carts are a little odd; the convention is that [[Item]] is not a
+single instance of the product, but instead has a reference to the
+product, and a count of how many the buyer wants.  To that end, I am
+adding two methods that extend Item: [[.update()]], which changes the
+current quantity, and [[.price()]], which calculates the product's price
+times the quantity:
 
-Models are duck-typed by default; they do not care what you put into
-them.  So all I need to say is that a [[Product]] is-a [[Model]].  The
-Collection is straightforward as well; I tell it what model it
-represents, override the [[initialize()]] method (which is empty in
-the Backbone default) to inform this Collection that it has a url, and
-create the comparator function for default sorting.
-
-Note that Coffeescript uses '@' to represent [[this]], and always
-returns the last lvalue generated by every function and method.  So
-the last line of [[initialize]] below compiles to [[return this]].
-
-<<product models>>=
+<<models>>=
 class Product extends Backbone.Model
 
+class Item extends Backbone.Model
+    update: (amount) ->
+        return if amount == @get 'quantity'
+        @set {quantity: amount}, {silent: true}
+        @collection.trigger 'update', @
+
+    price: () ->
+        @get('product').get('price') * @get('quantity')
+@
+
+The methods [[.get(item)]] and [[.set(item, value)]] are at the heart of
+Backbone.Model.  They're how you set individual attributes on the
+object being manipulated.  Notice how I can 'get' the product, which is
+a Backbone.Model, and then 'get' its price.
+
+Backbone supplies its own event management toolkit.  Changing a model
+triggers various events, none of which matter here in this context so I
+silence the event, but then I tell the Item's Backbone.Collection that
+the Model has changed.  Events are the primary way in which Backbone
+objects interact, so understanding them is key to using Backbone
+correctly.
+
+Collections, like Models, are just objects you can (and often must)
+extend to support your application's needs.  Just as a Model has
+\texttt{.get()} and \texttt{.set()}, a Collection has [[.add(item)]] and
+[[.remove(id)]] as methods.  Collections have a lot more than that.
+
+Both Models and Collections also have [[.fetch()]] and [[.save()]].  If
+either has a URL, these methods allow the collection to represent data 
+on the server, and to save that data back to the server.  The default
+method is a simple JSON object representing either a Model's attributes,
+or a JSON list of the Collection's models' attributes.
+
+The [[Product.Collection]] will be loading it's list of albums via these
+methods to (in our case) static JSON back-end.  
+
+<<product collection>>=
 class ProductCollection extends Backbone.Collection
     model: Product
 
     initialize: (models, options) ->
         @url = options.url
-        @
 
     comparator: (item) ->
-        item.get('title')
-@
+        item.get 'title'
+@ 
 
+The [[.model]] attribute tells the [[ProductCollection]] that if
+[[.add()]] or [[.fetch()]] are called and the contents are plain JSON,
+a new [[Product]] Model should be initialized with the JSON data and
+that will be used as a new object for the Collection.
 
+The [[.comparator()]] method specifies the per-model value by which the
+Collection should be sorted.  Sorting happens automatically whenever the
+Collection receives an event indicating its contents have been altered.
 
-For the shopping cart, our cart will hold [[Item]]s, and the cart
-itself will be an [[ItemCollection]].  Shoppings carts are a little
-odd; the convention is that an [[Item]] is not a single instance of a
-product, but a reference to the products and a quantity.
+The [[ItemCollection]] doesn't have a URL, but we do have several helper
+methods to add.  We don't want to add Items; instead, we want to add
+products as needed, then update the count as requested.  If the product
+is already in our system, we don't want to create duplicates.
 
-One thing we will be doing is changing the quantity, so I have
-provided a convenience function for the Item that allows you to do
-that.  Now, no client classes such as Views need to know how the
-quantity is updated.
-
-Also, it would be nice to know the total price of the Item.
-
-<<cart models>>=
-class Item extends Backbone.Model
-    update: (amount) ->
-        if amount == @get('quantity')
-            return
-        @set {quantity: amount}, {silent: true}
-        @collection.trigger('change', this)
-
-    price: () ->
-        @get('product').get('price') * @get('quantity')
-
-@
-
-The [[ItemCollection]] is a little trickier.  It is entirely
-client-side; it has no synchronization with the backend at all.  But
-it does have a model.
-
-The [[ItemCollection]] must be able to find an Item in the cart to
-update when a view needs it.  If the Item is not in the Collection, it
-must create one.  The method [[getOrCreateItemForProduct]] does this.
-It uses the [[detect()]] method, a method [[Collection]] inherits from
-Backbone's one dependency, Underscore.js; [[detect()]] returns the
-first [[Item]] in the [[ItemCollection]] for which the function
-returns [[true]].  Also, when I have to create a new Item, I want to
-add it to the collection, and I pass the parameter [[silent]], which
-prevents the Collection from notifying event subscribers that the
-collection has changed.  Since this is an Item with zero objects in
-it, this is not a change to what the collection represents, and I
-don't want Views to react without having to.
-
-Finally, I add two methods that return the total count of objects in
-the collection (not [[Items]], but actual [[Products]]), and the total
-cost of those items in the cart.  The Underscore method [[reduce()]]
-does this by taking a function for adding progressive items, and a
-starting value.
-
-<<cart models>>=
+<<cart collection>>=
 class ItemCollection extends Backbone.Collection
     model: Item
 
-    getOrCreateItemForProduct: (product) ->
-        pid = product.get('id')
-        i = this.detect (obj) -> (obj.get('product').get('id') == pid)
-        if (i)
-            return i
-        i = new Item
-            product: product
-            quantity: 0
-        @add i, {silent: true}
-        i
+@
 
+First, we ensure that if we don't receive an amount, we at least provide
+a valid \textit{numerical} value to our code.  The [[.detect()]] method
+lets us find an object in our Collection using a function to compare
+them; it returns the first object that matches.
+
+If we find the object, we update it and return.  If we don't, we create
+a new one, exploiting the fact that, since we specified the Collection's
+Model above, it will automatically be created as a Model in the
+Collection at the end of this call.  In either case, we return the new 
+Item to be handled further by the calling code.
+
+<<cart collection>>=
+    updateItemForProduct: (product, amount) ->
+        amount = if amount? then amount else 0
+        pid = product.get 'id'
+        i = this.detect (obj) -> (obj.get('product').get('id') == pid)
+        if i
+            i.update(amount)
+            return i
+
+        @add {product: product, quantity: amount}
+
+@
+
+And finally, two methods to add up how many objects are in your cart,
+and the total price.  The first line creates a function to get the 
+number for a single object and add it to a memo.  The second line uses
+the [[.reduce()]] method, which goes through each object in the
+collection and runs the function, passing the results of each run to the
+next as the memo.
+
+<<cart cart collection>>=
+@ 
     getTotalCount: () ->
-        addup = (memo, obj) -> obj.get('quantity') + memo
+        addup = (memo, obj) -> memo + obj.get 'quantity'
         @reduce addup, 0
 
     getTotalCost: () ->
-        addup = (memo, obj) ->obj.price() + memo
-        @reduce(addup, 0);
+        addup = (memo, obj) -> memo + obj.price() 
+        @reduce addup, 0
 
 @
 
@@ -235,12 +248,11 @@ listen for events, and a model or collection they represent within
 that element.  Views are not rigid; it's just Javascript and the DOM,
 and you can hook external events as needed.
 
-More importantly, a View is sensitive to events \textit{within its
-  model or collection}, and can respond to changes automatically.
-This way, if you have a rich data ecosystem, when changes to one data
-item results in a cascade of changes throughout your datasets, the
-views will receive ``change'' events and can update themselves
-accordingly.
+More importantly, a View is sensitive to events \textit{within its model
+  or collection}, and can respond to changes automatically.  This way,
+if you have a rich data ecosystem, when changes to one data item results
+in a cascade of changes throughout your datasets, the views will receive
+``change'' events and can update themselves accordingly.
 
 I will show how this works with the shopping cart widget.
 
@@ -263,13 +275,17 @@ class _BaseView extends Backbone.View
 
 The above says that I am creating a class called \texttt{BaseView} and
 defining two fields.  The first, 'parent', will be used by all child
-views to identify into which DOM object the View root element will
-be rendered.  The second defines a common class we will use for the
-purpose of identifying these views to jQuery.  Backbone automatically
-creates a new [[DIV]] object with the class 'viewport' when a view
-constructor is called.  It will be our job to attach that [[DIV]] to
-the DOM.  In the HTML, you will see the [[DIV\#main]] object where most
-of the work will be rendered.
+views to identify into which DOM object the View root element will be
+rendered.  The second defines a common class we will use for the purpose
+of identifying these views to jQuery.  Backbone automatically creates a
+new [[DIV]] object with the class 'viewport' when a view constructor is
+called.  It will be our job to attach that [[DIV]] to the DOM.  In the
+HTML, you will see the [[DIV\#main]] object where most of the work will
+be rendered.
+
+As an alternative, the viewport object may already exist, in which case
+you just find it with a selector, and the view attaches itself to that
+DOM object from then on.
 
 <<base view>>=
     initialize: () ->
@@ -290,8 +306,8 @@ anything.
 
 Next, we will define the hide and show functions.
 
-Note that in coffeescript, the [[=>]] operator completely replaces the
-[[_.bind()]] function provided by underscore.
+Note that in Coffeescript, the [[=>]] operator completely replaces the
+[[.bind()]] function provided by modern Javascript.
 
 <<base view>>=
     hide: () ->
@@ -309,17 +325,17 @@ Note that in coffeescript, the [[=>]] operator completely replaces the
 
 @
 
-\textbf{Deferred} is a new feature of jQuery.  It is a different
-mechanism for invoking callbacks by attaching attributes and behavior
-to the callback function.  By using this, we can say thing like
-``\textit{When} everything is hidden (when every deferred returned
-from \textbf{hide} has been resolved), \textit{then} show the
-appropriate viewport.''  Deferreds are incredibly powerful, and this
-is a small taste of what can be done with them.
+\textbf{Deferred} is a feature of jQuery called ``promises''.  It is a
+different mechanism for invoking callbacks by attaching attributes and
+behavior to the callback function.  By using this, we can say thing like
+``\textit{When} everything is hidden (when every deferred returned from
+\textbf{hide} has been resolved), \textit{then} show the appropriate
+viewport.''  Deferreds are incredibly powerful, and this is a small
+taste of what can be done with them.
 
-Before we move on, let's take a look at the HAML we're going to use
-for our one-page application.  The code below compiles beautifully
-into the same HTML seen in the original Backbone Store.
+Before we move on, let's take a look at the HAML we're going to use for
+our one-page application.  The code below compiles beautifully into the
+same HTML seen in the original Backbone Store.
 
 <<index.haml>>=
 !!! 5
@@ -338,9 +354,9 @@ into the same HTML seen in the original Backbone Store.
           The Backbone Store
         .cart-info
       #main
-    %script{:src => "jquery-1.6.2.min.js", :type => "text/javascript"}
-    %script{:src => "underscore.js", :type => "text/javascript"}
-    %script{:src => "backbone.js", :type => "text/javascript"}
+    %script{:src => "lib/jquery.js", :type => "text/javascript"}
+    %script{:src => "lib/underscore.js", :type => "text/javascript"}
+    %script{:src => "lib/backbone.js", :type => "text/javascript"}
     %script{:src => "store.js", :type => "text/javascript"}
 @
 
@@ -358,12 +374,12 @@ Backbone users frequently have: \textit{What is \texttt{render()}
 \texttt{Render()} is there to \textit{change the view when the
   underlying data changes}.  It renders the data into a view.  In our
 functionality, we use the parent class's \texttt{show()} and
-\texttt{hide()} methods to actually show the view.
+\texttt{hide()} methods to actually show the view.  
 
-That call to [[\_super\_]] is a Backbone idiom for calling a method on
-the parent object.  It is, as far as anyone knows, the only way to
-invoke a superclass method if it has been redefined in a subclass.
-It is rather ugly, but useful.
+That call to [[.prototype]] is a Javascript idiom for calling a method
+on the parent object.  It is, as far as anyone knows, the only way to
+invoke a superclass method if it has been redefined in a subclass.  It
+is rather ugly, but useful.
 
 <<product list view>>=
 class ProductListView extends _BaseView
@@ -371,7 +387,7 @@ class ProductListView extends _BaseView
     template: $("#store_index_template").html()
 
     initialize: (options) ->
-        @constructor.__super__.initialize.apply @, [options]
+        _BaseView.prototype.initialize.apply @, [options]
         @collection.bind 'reset', _.bind(@render, @)
 
     render: () ->
@@ -414,22 +430,20 @@ but note that we are again using [[\#main]] as our target; we will be
 showing and hiding the various [[DIV]] objects in [[\#main]] again and
 again.
 
-The only trickiness here is twofold: the (rather hideous) means by
-which one calls the method of a parnt class from a child class via
-Backbone's class heirarchy (this is most definitely \textbf{not}
-Javascript standard), and keeping track of the itemcollection object,
-so we can add and change items as needed.
+The only trickiness here is twofold: the means by which one calls the
+method of a parent class from a child class via Backbone's class
+heirarchy, and keeping track of the itemcollection object, so we can add
+and change items as needed.
 
 <<product detail view>>=
 class ProductView extends _BaseView
     id: 'productitemview'
     template: $("#store_item_template").html()
     initialize: (options) ->
-            @constructor.__super__.initialize.apply @, [options]
-            @itemcollection = options.itemcollection
-            @item = @itemcollection.getOrCreateItemForProduct @model
-            @
-
+        _BaseView.prototype.initialize.apply @, [options]
+        @itemcollection = options.itemcollection
+        @item = @itemcollection.getOrCreateItemForProduct @model
+        
 @
 %$
 
@@ -691,10 +705,12 @@ Here's the entirety of the program.  Coffeescript provides its own
 namespace wrapper:
 
 <<store.coffee>>=
-<<product models>>
+<<models>>
 
-<<cart models>>
+<<product collection>>
 
+<<cart collection>>
+    
 <<base view>>
 
 <<product list view>>
