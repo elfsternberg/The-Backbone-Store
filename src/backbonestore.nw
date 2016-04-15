@@ -403,7 +403,19 @@ our purposes and it means we don't have to import another library.  It
 vaguely resembles ERB from Rails, so if you are familiar with that,
 you should understand this fairly easily.
 
-And here is the HAML:
+There are many different ways of providing templates to Backbone.  The
+most common, especially for small templates, is to just include it as an
+inline string inside the View.  The \textit{least} common, I'm afraid,
+is the one I'm doing here: using the \<script\> tag with an unusual mime
+type to include it with the rest of the HTML.  I like this method
+because it means all of my HTML is in one place.
+
+For much larger programs, those that use features such as
+\nwanchorto{http://requirejs.org/}{Require.js}, a common technique is to
+keep the HTML template fragment in its own file and to import it using
+Require's ``text'' plugin.
+
+Here is the HAML for our home page's template:
 
 <<product list template>>=
 %script#store_index_template(type="text/x-underscore-tmplate")
@@ -431,7 +443,7 @@ again.
 
 The only trickiness here is twofold: the means by which one calls the
 method of a parent class from a child class via Backbone's class
-heirarchy, and keeping track of the itemcollection object, so we can add
+heirarchy, and keeping track of the ItemCollection object, so we can add
 and change items as needed.
 
 <<product detail view>>=
@@ -477,14 +489,12 @@ cart model, which is where it belongs: \textit{knowledge about items
   and each item's relationship to its collection belongs in the
   collection}.
 
-Look closely at the [[update()]] method.  The reference [[@\$]] is
-a special Backbone object that limits selectors to objects inside the
+Look closely at the [[update()]] method.  The reference [[@\$]] is a
+special Backbone object that limits selectors to objects inside the
 element of the view.  Without it, jQuery would have found the first
 input field of class 'uqf' in the DOM, not the one for this specific
-view.  [[@\$('.uqf')]] is shorthand for [[$('uqf', @el)]], and
-helps clarify what it is you're looking for.
-
-%'
+view.  [[@\$('.uqf')]] is shorthand for [[$('uqf', @el)]], and helps
+clarify what it is you're looking for.
 
 <<product detail view>>=
     update: (e) ->
@@ -495,7 +505,6 @@ helps clarify what it is you're looking for.
         @update(e) if e.keyCode == 13
 
 @
-%$
 
 The render is straightforward:
 
@@ -660,7 +669,6 @@ showing the index:
         $.when(@hideAllViews()).then(() -> view.show())
 
 @
-%$
 
 On the other hand, showing the product detail page is a bit trickier.
 In order to avoid re-rendering all the time, I am going to create a

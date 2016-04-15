@@ -62,15 +62,21 @@ htdocs/store.js: htdocs work/store.coffee
 work/store.coffee: work src/backbonestore.nw
 	$(NOTANGLE) -c -Rstore.coffee src/backbonestore.nw > work/store.coffee
 
-.nw.tex:
-	$(NOWEAVE) -x -delay $*.nw > $*.tex
+docs/backbonestore.tex: docs src/backbonestore.nw
+	${NOWEAVE} -x -delay src/backbonestore.nw > docs/backbonestore.tex	
 
-.tex.pdf:
-	xelatex $*.tex; \
-	while grep -s 'Rerun to get cross-references right' $*.log; \
+docs/backbonestore.pdf: docs/backbonestore.tex
+	xelatex docs/backbonestore.tex; \
+	while grep -s 'Rerun to get cross-references right' docs/backbonestore.log; \
         do \
-		xelatex *$.tex; \
+		xelatex docs/backbonestore.tex; \
 	done
+
+pdf: docs/backbonestore.pdf
+
+docs/backbonestore.html: docs src/backbonestore.nw
+	${NOWEAVE} -html -x -delay src/backbonestore.nw > docs/backbonestore.html
+
 
 clean:
 	- rm -f htdocs/*.* docs/*.tex docs/*.dvi docs/*.aux docs/*.toc docs/*.log docs/*.out
