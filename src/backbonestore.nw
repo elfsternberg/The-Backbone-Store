@@ -228,8 +228,7 @@ the [[.reduce()]] method, which goes through each object in the
 collection and runs the function, passing the results of each run to the
 next as the memo.
 
-<<cart cart collection>>=
-@ 
+<<cart collection>>=
     getTotalCount: () ->
         addup = (memo, obj) -> memo + obj.get 'quantity'
         @reduce addup, 0
@@ -388,7 +387,7 @@ class ProductListView extends _BaseView
 
     initialize: (options) ->
         _BaseView.prototype.initialize.apply @, [options]
-        @collection.bind 'reset', _.bind(@render, @)
+        @collection.bind 'reset', @render.bind @
 
     render: () ->
         @el.html(_.template(@template)({'products': @collection.toJSON()}))
@@ -490,7 +489,7 @@ helps clarify what it is you're looking for.
 <<product detail view>>=
     update: (e) ->
         e.preventDefault()
-        @itemcollection.update @model, parseInt(@$('.uqf').val())
+        @itemcollection.updateItemForProduct @model, parseInt(@$('.uqf').val())
 
     updateOnEnter: (e) ->
         @update(e) if e.keyCode == 13
@@ -544,7 +543,7 @@ class CartWidget extends Backbone.View
     template: $('#store_cart_template').html()
 
     initialize: () ->
-        @collection.bind('change', _.bind(@render, @));
+        @collection.bind 'update', @render.bind @
 
 @
 %$
@@ -560,7 +559,7 @@ show that it did changed:
 
 <<cart widget>>=
     render: () ->
-        tel = @el.html _.template(@template)({
+        tel = @$el.html _.template(@template)({
             'count': @collection.getTotalCount()
             'cost': @collection.getTotalCost()
         })
