@@ -9,5 +9,6 @@ bower_components/*
 npm-debug.log
 work/*
 htdocs/*.*
+docs/*
 htdocs/lib
 package.yml

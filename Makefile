@@ -67,16 +67,19 @@ docs/backbonestore.tex: docs src/backbonestore.nw
 
 docs/backbonestore.pdf: docs/backbonestore.tex
 	xelatex docs/backbonestore.tex; \
-	while grep -s 'Rerun to get cross-references right' docs/backbonestore.log; \
+	while grep -s 'Rerun to get cross-references right' ./backbonestore.log; \
         do \
 		xelatex docs/backbonestore.tex; \
 	done
+	mv backbonestore.pdf docs
+	rm -f ./backbonestore.log ./backbonestore.aux ./backbonestore.out
 
 pdf: docs/backbonestore.pdf
 
 docs/backbonestore.html: docs src/backbonestore.nw
-	${NOWEAVE} -html -x -delay src/backbonestore.nw > docs/backbonestore.html
+	$(NOWEAVE) -filter l2h -delay -x -autodefs c -html src/backbonestore.nw > docs/backbonestore.html
 
+html: docs/backbonestore.html
 
 clean:
 	- rm -f htdocs/*.* docs/*.tex docs/*.dvi docs/*.aux docs/*.toc docs/*.log docs/*.out
