@@ -34,7 +34,7 @@ htdocs/lib/backbone.js:
 
 install:
 	npm install
-	bower install jquery underscore backbone
+	./node_modules/bower/bin/bower install jquery underscore backbone
 
 setup: install $(LIBS)
 

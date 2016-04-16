@@ -9,7 +9,8 @@
     "stylus": "^0.54.0"
   },
   "devDependencies": {
-    "inotify": "^1.4.0"
+    "inotify": "^1.4.0",
+    "bower": "^1.7.0"
   },
   "scripts": {
     "test": "make serve"
