@@ -80,12 +80,12 @@ A note: this article was written with the
 \nwanchorto{http://en.wikipedia.org/wiki/Literate_programming}{Literate
   Programming} toolkit
 \nwanchorto{http://www.cs.tufts.edu/~nr/noweb/}{Noweb}. Where you see
-something that looks like \\<\\<this\\>\\>, it's a placeholder for code
-described elsewhere in the document.  Placeholders with an equal sign
-at the end of them indicate the place where that code is defined.  The
-link (U->) indicates that the code you're seeing is used later in the
-document, and (<-U) indicates it was used earlier but is being defined
-here.
+something that looks like $\langle\langle$this$\rangle\rangle$, it's a
+placeholder for code described elsewhere in the document.  Placeholders
+with an equal sign at the end of them indicate the place where that code
+is defined.  The link (U->) indicates that the code you're seeing is
+used later in the document, and (<-U) indicates it was used earlier but
+is being defined here.
 
 \subsection{Revision}
 
@@ -247,11 +247,20 @@ listen for events, and a model or collection they represent within
 that element.  Views are not rigid; it's just Javascript and the DOM,
 and you can hook external events as needed.
 
-More importantly, a View is sensitive to events \textit{within its model
-  or collection}, and can respond to changes automatically.  This way,
-if you have a rich data ecosystem, when changes to one data item results
-in a cascade of changes throughout your datasets, the views will receive
-``change'' events and can update themselves accordingly.
+More importantly, if you pass a model or collection to a View, that View
+becomes sensitive to events \textit{within its model or collection}, and
+can respond to changes automatically.  This way, if you have a rich data
+ecosystem, when changes to one data item results in a cascade of changes
+throughout your datasets, the views will receive ``change'' events and
+can update themselves accordingly.
+
+In a way, a View can be thought of as two separate but important
+sub-programs, each based on events.  The first listens to events from
+the DOM, and forwards data-changing events to associated models or
+collections.  The second listens to events from data objects and
+re-draws the View's contents when the data changes.  Keeping these
+separate in your mind will help you design Backbone applications
+successfully.
 
 I will show how this works with the shopping cart widget.
 
@@ -279,7 +288,7 @@ rendered.  The second defines a common class we will use for the purpose
 of identifying these views to jQuery.  Backbone automatically creates a
 new [[DIV]] object with the class 'viewport' when a view constructor is
 called.  It will be our job to attach that [[DIV]] to the DOM.  In the
-HTML, you will see the [[DIV\#main]] object where most of the work will
+HTML, you will see the [[DIV#main]] object where most of the work will
 be rendered.
 
 As an alternative, the viewport object may already exist, in which case
@@ -297,7 +306,7 @@ DOM object from then on.
 %$
 
 The method above ensures that the element is rendered, but not
-visible, and contained within the [[DIV\#main]].  Note also that
+visible, and contained within the [[DIV#main]].  Note also that
 the element is not a sacrosanct object; the Backbone.View is more a
 collection of standards than a mechanism of enforcement, and so
 defining it from a raw DOM object to a jQuery object will not break
@@ -407,9 +416,9 @@ you should understand this fairly easily.
 There are many different ways of providing templates to Backbone.  The
 most common, especially for small templates, is to just include it as an
 inline string inside the View.  The \textit{least} common, I'm afraid,
-is the one I'm doing here: using the \\<script\\> tag with an unusual mime
-type to include it with the rest of the HTML.  I like this method
-because it means all of my HTML is in one place.
+is the one I'm doing here: using the $<$script$>$ tag with an
+unusual mime type to include it with the rest of the HTML.  I like this
+method because it means all of my HTML is in one place.
 
 For much larger programs, those that use features such as
 \nwanchorto{http://requirejs.org/}{Require.js}, a common technique is to
