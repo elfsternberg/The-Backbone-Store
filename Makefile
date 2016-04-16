@@ -1,58 +1,78 @@
-.SUFFIXES: .nw .js .pdf .html .tex 
+.PHONY: setup store serve
 
 NOTANGLE=		notangle
 NOWEAVE=		noweave
-ECHO=			/bin/echo
+ECHO=			echo
 
-all: index.html store.js 
+LIBS:= htdocs/lib/underscore.js htdocs/lib/jquery.js htdocs/lib/backbone.js
 
-.nw.html:
-	$(NOWEAVE) -filter l2h -delay -x -index -autodefs c -html $*.nw > $*.html
+all: htdocs/index.html htdocs/store.js htdocs/jsonstore.css htdocs/data/items.json
+	@if [ ! -e "./htdocs/lib" ]; then \
+		echo "Please do 'make setup' before continuing"; \
+		exit 1; \
+	fi
 
-.nw.tex:
-	$(NOWEAVE) -x -delay $*.nw > $*.tex 			#$
+serve: all
+	$(COFFEE) ./bin/autoreload
 
-.tex.pdf:
-	xelatex $*.tex; \
-	while grep -s 'Rerun to get cross-references right' $*.log; \
+store: all
+
+htdocs/lib:
+	mkdir -p htdocs/lib
+
+htdocs/lib/underscore.js: htdocs/lib
+	cp bower_components/underscore/underscore.js htdocs/lib
+
+htdocs/lib/jquery.js: htdocs/lib
+	cp bower_components/jquery/dist/jquery.js htdocs/lib
+
+htdocs/lib/backbone.js:
+	cp bower_components/backbone/backbone.js htdocs/lib
+
+install:
+	npm install
+	./node_modules/bower/bin/bower install jquery underscore backbone
+
+setup: install $(LIBS)
+
+docs:
+	mkdir -p docs
+
+htdocs/index.html: src/backbonestore.nw
+	$(NOTANGLE) -c -Rindex.haml src/backbonestore.nw > htdocs/index.html
+
+htdocs/jsonstore.css: src/backbonestore.nw
+	$(NOTANGLE) -c -Rjsonstore.css src/backbonestore.nw > htdocs/jsonstore.css
+
+htdocs/store.js: src/backbonestore.nw
+	$(NOTANGLE) -c -Rstore.js src/backbonestore.nw > htdocs/store.js
+
+docs/backbonestore.tex: docs src/backbonestore.nw
+	${NOWEAVE} -x -delay src/backbonestore.nw > docs/backbonestore.tex	
+
+docs/backbonestore.pdf: docs/backbonestore.tex
+	xelatex docs/backbonestore.tex; \
+	while grep -s 'Rerun to get cross-references right' ./backbonestore.log; \
         do \
-		xelatex *$.tex; \
+		xelatex docs/backbonestore.tex; \
 	done
+	mv backbonestore.pdf docs
+	rm -f ./backbonestore.log ./backbonestore.aux ./backbonestore.out
 
-.nw.js:
-	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
-	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-js-tmp
-	@ if [ -s "$*.nw-js-tmp" ]; then \
-		mv $*.nw-js-tmp $@; \
-	else \
-		echo "$@ not found in $<"; \
-	rm $*.nw-js-tmp; \
-	fi	
+pdf: docs/backbonestore.pdf
 
-store.js: backbonestore.nw
-	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
-	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-html-tmp
-	@ if [ -s "$*.nw-html-tmp" ]; then \
-		mv $*.nw-html-tmp $@; \
-	else \
-		echo "$@ not found in $<"; \
-	rm $*.nw-tmp; \
-	fi	
+docs/backbonestore.html: docs src/backbonestore.nw
+	$(NOWEAVE) -filter l2h -delay -x -autodefs c -html src/backbonestore.nw > docs/backbonestore.html
 
-index.html: backbonestore.nw
-	@ $(ECHO) $(NOTANGLE) -c -R$@ $<
-	@ - $(NOTANGLE) -c -R$@ $< > $*.nw-html-tmp
-	@ if [ -s "$*.nw-html-tmp" ]; then \
-		mv $*.nw-html-tmp $@; \
-	else \
-		echo "$@ not found in $<"; \
-	rm $*.nw-tmp; \
-	fi	
-
+html: docs/backbonestore.html
 
 clean:
-	- rm -f *.tex *.dvi *.aux *.toc *.log *.out *.html *.js
+	- rm -f htdocs/*.* docs/*.tex docs/*.dvi docs/*.aux docs/*.toc docs/*.log docs/*.out
 
-realclean: clean
-	- rm -f *.pdf
+distclean: clean
+	- rm -fr ./htdocs/lib		
+
+realclean: distclean
+	- rm -fr docs
+
 
