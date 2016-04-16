@@ -449,7 +449,7 @@ and change items as needed.
 
 <<product detail view>>=
 class ProductView extends _BaseView
-    id: 'productitemview'
+    className: 'productitemview'
     template: $("#store_item_template").html()
     initialize: (options) ->
         _BaseView.prototype.initialize.apply @, [options]
@@ -787,6 +787,9 @@ body
   padding: 0px
 
 
+#main
+  position: relative
+
 #header
   background_gradient(#999)
   margin: 0px
@@ -812,7 +815,16 @@ body
 img
   border: 0
 
+.productitemview
+  position: absolute
+  top: 0
+  left: 0
+
 #productlistview
+  position: absolute
+  top: 0
+  left: 0
+
   ul
     list-style: none
 
