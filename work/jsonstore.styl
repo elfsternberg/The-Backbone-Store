@@ -1,0 +1,96 @@
+rounded(radius)
+  -moz-border-radius-topleft: radius
+  -moz-border-radius-topright: radius
+  -moz-border-radius-bottomleft: radius
+  -moz-border-radius-bottomright: radius
+  -webkit-border-bottom-right-radius: radius
+  -webkit-border-top-left-radius: radius
+  -webkit-border-top-right-radius: radius
+  -webkit-border-bottom-left-radius: radius
+  border-bottom-right-radius: radius
+  border-top-left-radius: radius
+  border-top-right-radius: radius
+  border-bottom-left-radius: radius
+
+background_gradient(base)
+  background: base
+  background: -webkit-gradient(linear, left top, left bottom, from(lighten(base, 20%)), to(darken(base, 20%)))
+  background: -moz-linear-gradient(top,  lighten(base, 20%), darken(base, 20%))
+
+body
+  font-family: "Lucida Grande", Lucida, Helvetica, Arial, sans-serif
+  background: #FFF
+  color: #333
+  margin: 0px
+  padding: 0px
+
+
+#main
+  position: relative
+
+#header
+  background_gradient(#999)
+  margin: 0px
+  padding: 20px
+  border-bottom: 1px solid #ccc
+
+  h1
+    font-family: Inconsolata, Monaco, Courier, mono
+    color: #FFF
+    margin: 0px
+
+  .cart-info
+    position: absolute
+    top: 0px
+    right: 0px
+    text-align: right
+    padding: 10px
+    background_gradient(#555)
+    color: #FFF
+    font-size: 12px
+    font-weight: bold
+
+img
+  border: 0
+
+.productitemview
+  position: absolute
+  top: 0
+  left: 0
+
+#productlistview
+  position: absolute
+  top: 0
+  left: 0
+
+  ul
+    list-style: none
+
+.item
+  float:left
+  width: 250px
+  margin-right: 10px
+  margin-bottom: 10px
+  padding: 5px
+  rounded(5px)
+  border: 1px solid #ccc
+  text-align:center
+  font-size: 12px
+
+.item-title
+  font-weight: bold
+
+.item-artist
+  font-weight: bold
+  font-size: 14px
+
+.item-detail
+  margin: 10px 0 0 10px
+
+  .item-image
+    float:left
+    margin-right: 10px
+
+  .item-info
+    padding: 100px 10px 0px 10px
+
