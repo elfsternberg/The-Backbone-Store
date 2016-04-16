@@ -310,17 +310,18 @@ Note that in Coffeescript, the [[=>]] operator completely replaces the
 
 <<base view>>=
     hide: () ->
+        dfd = $.Deferred()
         if not @el.is(':visible')
-            return null
-        promise = $.Deferred (dfd) => @el.fadeOut('fast', dfd.resolve)
-        promise.promise()
+            return dfd.resolve()
+        @el.fadeOut('fast', () -> dfd.resolve())
+        dfd.promise()
 
     show: () ->
+        dfd = $.Deferred()
         if @el.is(':visible')
-            return
-
-        promise = $.Deferred (dfd) => @el.fadeIn('fast', dfd.resolve)
-        promise.promise()
+            return dfd.resolve()
+        @el.fadeIn('fast', () -> dfd.resolve())
+        dfd.promise()
 
 @
 
@@ -661,12 +662,14 @@ method returns only an array of deferreds.
 @
 
 Showing the product list view is basically hiding everything, then
-showing the index:
+showing the index.  The function [[$$.when]] takes arguments of what to
+wait for; to make it take an array of arguments, you use the
+[[.apply()]] method.
 
 <<router>>=
     index: () ->
         view = @views['_index']
-        $.when(@hideAllViews()).then(() -> view.show())
+        $.when.apply($, @hideAllViews()).then(() -> view.show())
 
 @
 
