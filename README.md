@@ -20,6 +20,9 @@ application.  It also uses the NoWeb Literate Programming documentation
 tools, and building the documentation from source requires Xelatex be
 installed as well.
 
+The command 'make serve' probably only works under a fairly modern
+Linux, as it's dependent upon the kernel's inotify facility.
+
 ## Branches
 
 There are two major development branches for The Backbone Store.
