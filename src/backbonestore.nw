@@ -116,6 +116,7 @@ var Item = Backbone.Model.extend({
         return this.get('product').get('price') * this.get('quantity');
     }
 });
+
 @ 
 
 The methods [[.get(item)]] and [[.set(item, value)]] are at the heart of
@@ -149,8 +150,9 @@ methods to (in our case) static JSON back-end.
 var ProductCollection = Backbone.Collection.extend({
     model: Product,
     initialize: function(models, options) {
-        return this.url = options.url;
+        this.url = options.url;
     },
+
     comparator: function(item) {
         return item.get('title');
     }
@@ -448,23 +450,23 @@ Require's ``text'' plugin.
 Here is the HTML for our home page's template:
 
 <<product list template>>=
-    <script id="store_index_template" type="text/x-underscore-tmplate">
-      <h1>Product Catalog</h1>
-      <ul>
-        <% for(i=0,l=products.length;i<l;++i) { p = products[i]; %>
-        <li class="item">
-          <div class="item-image">
-            <a href="#item/<%= p.id %>">
-              <img alt="<%= p.title %>" src="<%= p.image %>">
-            </a>
-          </div>
-          <div class="item-artist"><%= p.artist %></div>
-          <div class="item-title"><%= p.title %></div>
-          <div class="item-price">$<%= p.price %></div>
-        </li>
-        <% } %>
-      </ul>
-    </script>
+<script id="store_index_template" type="text/x-underscore-tmplate">
+  <h1>Product Catalog</h1>
+  <ul>
+    <% for(i=0,l=products.length;i<l;++i) { p = products[i]; %>
+    <li class="item">
+      <div class="item-image">
+        <a href="#item/<%= p.id %>">
+          <img alt="<%= p.title %>" src="<%= p.image %>">
+        </a>
+      </div>
+      <div class="item-artist"><%= p.artist %></div>
+      <div class="item-title"><%= p.title %></div>
+      <div class="item-price">$<%= p.price %></div>
+    </li>
+    <% } %>
+  </ul>
+</script>
 
 @
 
@@ -480,12 +482,14 @@ heirarchy, and keeping track of the ItemCollection object, so we can add
 and change items as needed.
 
 <<product detail view>>=
-class ProductView extends _BaseView
-    className: 'productitemview'
-    template: $("#store_item_template").html()
-    initialize: (options) ->
-        _BaseView.prototype.initialize.apply @, [options]
-        @itemcollection = options.itemcollection
+var ProductView = BaseView.extend({
+    className: 'productitemview',
+    template: _.template($("#store_item_template").html()),
+    
+    initialize: function(options) {
+        BaseView.prototype.initialize.apply(this, [options]);
+        this.itemcollection = options.itemcollection;
+    },
         
 @
 %$
@@ -501,9 +505,10 @@ those that jQuery's ``delegate'' understands.  As of 1.5, that seems
 to be just about all of them.
 
 <<product detail view>>=
-    events:
+    events: {
         "keypress .uqf" : "updateOnEnter"
         "click .uq"     : "update"
+    },
 
 @
 
@@ -530,21 +535,27 @@ view.  [[@\$('.uqf')]] is shorthand for [[$('uqf', @el)]], and helps
 clarify what it is you're looking for.
 
 <<product detail view>>=
-    update: (e) ->
-        e.preventDefault()
-        @itemcollection.updateItemForProduct @model, parseInt(@$('.uqf').val())
+    update: function(e) {
+        e.preventDefault();
+        return this.itemcollection.updateItemForProduct(this.model, parseInt(this.$('.uqf').val()));
+    },
 
-    updateOnEnter: (e) ->
-        @update(e) if e.keyCode == 13
+    updateOnEnter: function(e) {
+        if (e.keyCode === 13) {
+            return this.update(e);
+        }
+    },
 
 @
 
 The render is straightforward:
 
 <<product detail view>>=
-    render: () ->
-        @el.html(_.template(@template)(@model.toJSON()));
-        @
+    render: function() {
+        this.el.html(this.template(this.model.toJSON()));
+        return this;
+    }
+});
 
 @
 
@@ -552,26 +563,35 @@ The product detail template is fairly straightforward.  There is no
 [[underscore]] magic because there are no loops.
 
 <<product detail template>>=
-%script#store_item_template(type= "text/x-underscore-template")
-  .item-detail
-    .item-image
-      %img(src="<%= large_image %>" alt="<%= title %>")/
-    .item-info
-      .item-artist <%= artist %>
-      .item-title <%= title %>
-      .item-price $<%= price %>
-      .item-form
-      %form(action="#/cart" method="post")
-        %p
-          %label Quantity:
-          %input(type="text" size="2" name="quantity" value="1" class="uqf")/
-        %p
-          %input(type="submit" value="Add to Cart" class="uq")/
+<script id="store_item_template" type="text/x-underscore-template">
+  <div class="item-detail">
+    <div class="item-image">
+      <img alt="<%= title %>" src="<%= large_image %>">
+    </div>
+    <div class="item-info">
+      <div class="item-artist"><%= artist %></div>
+      <div class="item-title"><%= title %></div>
+      <div class="item-price">$<%= price %></div>
+      <div class="item-form"></div>
+      <form action="#/cart" method="post">
+        <p>
+          <label>Quantity:</label>
+          <input class="uqf" name="quantity" size="2" type="text" value="1">
+        </p>
+        <p>
+          <input class="uq" type="submit" value="Add to Cart">
+        </p>
+      </form>
+      <div class="item-link">
+        <a href="<%= url %>">Buy this item on Amazon</a>
+      </div>
+      <div class="back-link">
+        <a href="#">&laquo; Back to Items</a>
+      </div>
+    </div>
+  </div>
+</script>
 
-      .item-link
-        %a(href="<%= url %>") Buy this item on Amazon
-      .back-link
-        %a(href="#") &laquo; Back to Items
 @
 
 So, let's talk about that shopping cart thing.  We've been making the
@@ -580,12 +600,14 @@ product detail view, any corresponding subscribing views sholud
 automatically update.
 
 <<cart widget>>=
-class CartWidget extends Backbone.View
-    el: $('.cart-info')
-    template: $('#store_cart_template').html()
+var CartWidget = Backbone.View.extend({
+    el: $('.cart-info'),
+    template: _.template($('#store_cart_template').html()),
 
-    initialize: () ->
-        @collection.bind 'update', @render.bind @
+    initialize: function() {
+        Backbone.View.prototype.initialize.apply(this, arguments);
+        this.collection.bind('update', this.render.bind(this));
+    },
 
 @
 %$
@@ -600,21 +622,42 @@ template with the new count and cost, and then wiggle it a little to
 show that it did changed:
 
 <<cart widget>>=
-    render: () ->
-        tel = @$el.html _.template(@template)({
-            'count': @collection.getTotalCount()
-            'cost': @collection.getTotalCost()
-        })
-        tel.animate({paddingTop: '30px'}).animate({paddingTop: '10px'})
-        @
+    CartWidget.prototype.render = function() {
+        var tel = this.$el.html(this.template({
+            'count': this.collection.getTotalCount(),
+            'cost': this.collection.getTotalCost()
+        }));
+        tel.animate({ paddingTop: '30px' }).animate({ paddingTop: '10px' });
+        return this;
+    }
+});
 
 @
 
-And the HTML for the template is dead simple:
+You may have noticed that every render ends in [[return this]].  There's
+a reason for that.  Render is supposed to be pure statement: it's not
+supposed to calculate anything, nor is it supposed to mutate anything on
+the Javascript side.  It can and frequently does, but that's beside the
+point.  By returning [[this]], we can then call something immediately
+afterward.
+
+For example, let's say you have a pop-up dialog.  It starts life
+hidden.  You need to update the dialog, then show it:
+
+<<example>>=
+    myDialog.render().show();
+
+@ 
+
+Because what render() return is [[this]], this code works as expected.
+That's how you do chaining in HTML/Javascript.
+
+Back to our code.  The HTML for the Cart widget template is dead simple:
 
 <<cart template>>=
-%script#store_cart_template(type="text/x-underscore-template")
-  %p Items: <%= count %> ($<%= cost %>)
+<script id="store_cart_template" type="text/x-underscore-template">
+  <p>Items: <%= count %> ($<%= cost %>)</p>
+</script>
 
 @
 %$
@@ -630,10 +673,10 @@ of the [[Views]], the [[ProductCollection]], and the
 [[ItemCollection]].
 
 <<router>>=
-class BackboneStore extends Backbone.Router
-    views: {}
-    products: null
-    cart: null
+var BackboneStore = Backbone.Router.extend({
+    views: {},
+    products: null,
+    cart: null,
 
 @
 
@@ -641,9 +684,10 @@ There are two events we care about: view the list, and view a detail.
 They are routed like this:
 
 <<router>>=
-    routes:
-        "": "index"
+    routes: {
+        "": "index",
         "item/:id": "product"
+    },
 
 @
 
@@ -659,19 +703,18 @@ back-end server.  For that, I use the jQuery deferred again, because
 returns the result of an [[ajax()]] call, which is a deferred.
 
 <<router>>=
-    initialize: (data) ->
-        @cart = new ItemCollection()
-        new CartWidget
-            collection: @cart
-
-        @products = new ProductCollection [],
-            url: 'data/items.json'
-        @views =
-            '_index': new ProductListView
-                collection: @products
-        $.when(@products.fetch({reset: true}))
-            .then(() -> window.location.hash = '')
-        @
+    initialize: function(data) {
+        Backbone.Router.prototype.initialize.apply(this, arguments);
+        this.cart = new ItemCollection();
+        new CartWidget({ collection: this.cart });
+        this.products = new ProductCollection([], { url: 'data/items.json' });
+        this.views = {
+            '_index': new ProductListView({ collection: this.products })
+        };
+        $.when(this.products.fetch({ reset: true })).then(function() {
+            return window.location.hash = '';
+        });
+    },
 
 @
 %$
@@ -682,14 +725,14 @@ and the product detail, inherited from [[\_BaseView]], which has the
 [[hide()]] and [[show()]] methods.  We want to hide all the views,
 then show the one invoked.  First, let's hide every view we know
 about.  [[hide()]] returns either a deferred (if the object is being
-hidden) or null.  The [[_.select()]] call at the end means that this
+hidden) or null.  The [[_.filter()]] call at the end means that this
 method returns only an array of deferreds.
 
 <<router>>=
-    hideAllViews: () ->
-        _.select(_.map(@views, (v) -> return v.hide()),
-            (t) -> t != null)
-
+    hideAllViews = function() {
+        return _.filter(_.map(this.views, function(v) { return v.hide(); }),
+                        function(t) { return t !== null; });
+    },
 
 @
 
@@ -699,9 +742,12 @@ wait for; to make it take an array of arguments, you use the
 [[.apply()]] method.
 
 <<router>>=
-    index: () ->
-        view = @views['_index']
-        $.when.apply($, @hideAllViews()).then(() -> view.show())
+    index: function() {
+        var view = this.views['_index'];
+        return $.when.apply($, this.hideAllViews()).then(function() {
+            return view.show();
+        });
+    },
 
 @
 
@@ -709,7 +755,8 @@ On the other hand, showing the product detail page is a bit trickier.
 In order to avoid re-rendering all the time, I am going to create a
 view for every product in which the user shows interest, and keep it
 around, showing it a second time if the user wants to see it a second
-time.
+time.  Note that the view only needs to be rendered \textit{once}, after
+which we can just hide or show it on request.
 
 Not that we pass it the [[ItemCollection]] instance.  It uses this to
 create a new item, which (if you recall from our discussion of
@@ -719,14 +766,22 @@ item and the item collection \textit{changes}, which in turn causes
 the [[CartWidget]] to update automagically as well.
 
 <<router>>=
-    product: (id) ->
-        product = @products.detect (p) -> p.get('id') == (id)
-        view = (@views['item.' + id] ||= new ProductView(
-            model: product,
-            itemcollection: @cart
-        ).render())
-        $.when(@hideAllViews()).then(
-            () -> view.show())
+    product: function(id) {
+        var view = this.views[id];
+        if (!view) {
+            var product = this.products.detect(function(p) {
+                return p.get('id') === id;
+            });
+            view = this.views[id] = new ProductView({
+                model: product,
+                itemcollection: this.cart
+            }).render()
+        }
+        return $.when(this.hideAllViews()).then(function() {
+            return view.show();
+        });
+    }
+});
 
 @
 %$
@@ -734,9 +789,11 @@ the [[CartWidget]] to update automagically as well.
 Finally, we need to start the program
 
 <<initialization>>=
-$(document).ready () ->
-    new BackboneStore();
-    Backbone.history.start();
+    $(document).ready(function() {
+        new BackboneStore();
+        return Backbone.history.start();
+    });
+
 @
 %$
 
@@ -763,131 +820,6 @@ namespace wrapper:
 <<router>>
 
 <<initialization>>
-@
-
-\section{A Little Stylus}
-
-Stylus is a beautiful little language that compiles down to CSS.  The
-original version of The Backbone Store used the same CSS provided from
-the original Sammy tutorial, but I wanted to show you this one extra
-tool because it's an essential part of my kit.
-
-If you want rounded borders, you know that writing all that code, for
-older browsers as well as modern ones, and providing it to all the
-different objects you want styled that way, can be time consuming.
-Stylus allows you to define a function that can be called from within
-any style, thus allowing you to define the style here, and attach a
-set style to a semantic value in your HTML:
-
-<<jsonstore.styl>>=
-rounded(radius)
-  -moz-border-radius-topleft: radius
-  -moz-border-radius-topright: radius
-  -moz-border-radius-bottomleft: radius
-  -moz-border-radius-bottomright: radius
-  -webkit-border-bottom-right-radius: radius
-  -webkit-border-top-left-radius: radius
-  -webkit-border-top-right-radius: radius
-  -webkit-border-bottom-left-radius: radius
-  border-bottom-right-radius: radius
-  border-top-left-radius: radius
-  border-top-right-radius: radius
-  border-bottom-left-radius: radius
-
-background_gradient(base)
-  background: base
-  background: -webkit-gradient(linear, left top, left bottom, from(lighten(base, 20%)), to(darken(base, 20%)))
-  background: -moz-linear-gradient(top,  lighten(base, 20%), darken(base, 20%))
-
-@
-
-And if you look down below you'll see the [[rounded()]] function
-called for the list items, which have borders.
-
-One of the real beauties of Stylus is that you can contains some style
-definitions within others.  You can see below that the header
-contains an H1, and the H1 definitions will be compiled to only apply
-within the context of the header.  Stylus allows you to write CSS the
-way you write HTML!
-
-<<jsonstore.styl>>=
-body
-  font-family: "Lucida Grande", Lucida, Helvetica, Arial, sans-serif
-  background: #FFF
-  color: #333
-  margin: 0px
-  padding: 0px
-
-
-#main
-  position: relative
-
-#header
-  background_gradient(#999)
-  margin: 0px
-  padding: 20px
-  border-bottom: 1px solid #ccc
-
-  h1
-    font-family: Inconsolata, Monaco, Courier, mono
-    color: #FFF
-    margin: 0px
-
-  .cart-info
-    position: absolute
-    top: 0px
-    right: 0px
-    text-align: right
-    padding: 10px
-    background_gradient(#555)
-    color: #FFF
-    font-size: 12px
-    font-weight: bold
-
-img
-  border: 0
-
-.productitemview
-  position: absolute
-  top: 0
-  left: 0
-
-#productlistview
-  position: absolute
-  top: 0
-  left: 0
-
-  ul
-    list-style: none
-
-.item
-  float:left
-  width: 250px
-  margin-right: 10px
-  margin-bottom: 10px
-  padding: 5px
-  rounded(5px)
-  border: 1px solid #ccc
-  text-align:center
-  font-size: 12px
-
-.item-title
-  font-weight: bold
-
-.item-artist
-  font-weight: bold
-  font-size: 14px
-
-.item-detail
-  margin: 10px 0 0 10px
-
-  .item-image
-    float:left
-    margin-right: 10px
-
-  .item-info
-    padding: 100px 10px 0px 10px
-
 @
 
 And that's it.  Put it all together, and you've got yourself a working
