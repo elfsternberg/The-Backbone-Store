@@ -15,13 +15,12 @@ from the original source material, and start a server.
 
 ## Requirements
 
-The build tool relies upon GNU Make, node-js, and the Ruby HAML
-application.  It also uses the NoWeb Literate Programming documentation
-tools, and building the documentation from source requires Xelatex be
-installed as well.
+The build tool relies upon GNU Make and node-js.  It also uses the NoWeb
+Literate Programming documentation tools, and building the documentation
+from source requires Xelatex be installed as well.
 
 The command 'make serve' probably only works under a fairly modern
-Linux, as it's dependent upon the kernel's inotify facility.
+Linux, as it is dependent upon the kernel's inotify facility.
 
 ## Branches
 
