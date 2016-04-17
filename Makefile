@@ -6,14 +6,14 @@ ECHO=			echo
 
 LIBS:= htdocs/lib/underscore.js htdocs/lib/jquery.js htdocs/lib/backbone.js
 
-all: htdocs/index.html htdocs/store.js htdocs/jsonstore.css htdocs/data/items.json
+all: htdocs/index.html htdocs/store.js htdocs/data/items.json
 	@if [ ! -e "./htdocs/lib" ]; then \
 		echo "Please do 'make setup' before continuing"; \
 		exit 1; \
 	fi
 
 serve: all
-	$(COFFEE) ./bin/autoreload
+	./bin/autoreload
 
 store: all
 
@@ -39,10 +39,7 @@ docs:
 	mkdir -p docs
 
 htdocs/index.html: src/backbonestore.nw
-	$(NOTANGLE) -c -Rindex.haml src/backbonestore.nw > htdocs/index.html
-
-htdocs/jsonstore.css: src/backbonestore.nw
-	$(NOTANGLE) -c -Rjsonstore.css src/backbonestore.nw > htdocs/jsonstore.css
+	$(NOTANGLE) -c -Rindex.html src/backbonestore.nw > htdocs/index.html
 
 htdocs/store.js: src/backbonestore.nw
 	$(NOTANGLE) -c -Rstore.js src/backbonestore.nw > htdocs/store.js
@@ -67,7 +64,7 @@ docs/backbonestore.html: docs src/backbonestore.nw
 html: docs/backbonestore.html
 
 clean:
-	- rm -f htdocs/*.* docs/*.tex docs/*.dvi docs/*.aux docs/*.toc docs/*.log docs/*.out
+	- rm -f htdocs/*.js htdocs/*.html docs/*.tex docs/*.dvi docs/*.aux docs/*.toc docs/*.log docs/*.out
 
 distclean: clean
 	- rm -fr ./htdocs/lib		

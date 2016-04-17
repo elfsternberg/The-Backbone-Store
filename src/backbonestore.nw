@@ -106,10 +106,11 @@ var Product = Backbone.Model.extend({});
 var Item = Backbone.Model.extend({
     update: function(amount) {
         if (amount === this.get('quantity')) {
-            return;
+            return this;
         }
         this.set({quantity: amount}, {silent: true});
-        return this.collection.trigger('update', this);
+        this.collection.trigger('update', this);
+        return this;
     },
     
     price: function() {
@@ -295,9 +296,9 @@ be rendered.
 As an alternative, the viewport object may already exist, in which case
 you just find it with a selector, and the view attaches itself to that
 DOM object from then on.  In older versions of the Backbone Store, we
-used to assign [[@el]] to a jQuery-wrapped version of the element;
+used to assign [[this.el]] to a jQuery-wrapped version of the element;
 that's no longer necessary, as Backbone provides you with its own
-version automatically in [[@$el]].
+version automatically in [[this.$el]].
 
 The 'parent' field is something I created for my own use, since I intend
 to have multiple child objects share the same piece of real-estate.  The
@@ -319,10 +320,10 @@ Next, we will define the hide and show functions.
 <<base view>>=
     hide: function() {
         var dfd = $.Deferred();
-        if (!this.el.is(':visible')) {
+        if (!this.$el.is(':visible')) {
             return dfd.resolve();
         }
-        this.el.fadeOut('fast', function() {
+        this.$el.fadeOut('fast', function() {
             return dfd.resolve();
         });
         return dfd.promise();
@@ -330,10 +331,10 @@ Next, we will define the hide and show functions.
 
     show: function() {
         var dfd = $.Deferred();
-        if (this.el.is(':visible')) {
+        if (this.$el.is(':visible')) {
             return dfd.resolve();
         }
-        this.el.fadeIn('fast', function() {
+        this.$el.fadeIn('fast', function() {
             return dfd.resolve();
         });
         return dfd.promise();
@@ -414,9 +415,9 @@ var ProductListView = BaseView.extend({
     },
 
     render: function() {
-        this.el.html(this.template({
+        this.$el.html(this.template({
             'products': this.collection.toJSON()
-        });
+        }));
         return this;
     }
 });
@@ -506,7 +507,7 @@ to be just about all of them.
 
 <<product detail view>>=
     events: {
-        "keypress .uqf" : "updateOnEnter"
+        "keypress .uqf" : "updateOnEnter",
         "click .uq"     : "update"
     },
 
@@ -527,11 +528,11 @@ cart model, which is where it belongs: \textit{knowledge about items
   and each item's relationship to its collection belongs in the
   collection}.
 
-Look closely at the [[update()]] method.  The reference [[@\$]] is a
+Look closely at the [[update()]] method.  The reference [[this.$]] is a
 special Backbone object that limits selectors to objects inside the
 element of the view.  Without it, jQuery would have found the first
 input field of class 'uqf' in the DOM, not the one for this specific
-view.  [[@\$('.uqf')]] is shorthand for [[$('uqf', @el)]], and helps
+view.  [[this.$('.uqf')]] is shorthand for [[$('uqf', this.el)]], and helps
 clarify what it is you're looking for.
 
 <<product detail view>>=
@@ -542,7 +543,7 @@ clarify what it is you're looking for.
 
     updateOnEnter: function(e) {
         if (e.keyCode === 13) {
-            return this.update(e);
+            this.update(e);
         }
     },
 
@@ -552,7 +553,7 @@ The render is straightforward:
 
 <<product detail view>>=
     render: function() {
-        this.el.html(this.template(this.model.toJSON()));
+        this.$el.html(this.template(this.model.toJSON()));
         return this;
     }
 });
@@ -622,7 +623,7 @@ template with the new count and cost, and then wiggle it a little to
 show that it did changed:
 
 <<cart widget>>=
-    CartWidget.prototype.render = function() {
+    render: function() {
         var tel = this.$el.html(this.template({
             'count': this.collection.getTotalCount(),
             'cost': this.collection.getTotalCost()
@@ -729,7 +730,7 @@ hidden) or null.  The [[_.filter()]] call at the end means that this
 method returns only an array of deferreds.
 
 <<router>>=
-    hideAllViews = function() {
+    hideAllViews: function() {
         return _.filter(_.map(this.views, function(v) { return v.hide(); }),
                         function(t) { return t !== null; });
     },
@@ -775,7 +776,7 @@ the [[CartWidget]] to update automagically as well.
             view = this.views[id] = new ProductView({
                 model: product,
                 itemcollection: this.cart
-            }).render()
+            }).render();
         }
         return $.when(this.hideAllViews()).then(function() {
             return view.show();
@@ -802,7 +803,7 @@ Finally, we need to start the program
 Here's the entirety of the program.  Coffeescript provides its own
 namespace wrapper:
 
-<<store.coffee>>=
+<<store.js>>=
 <<models>>
 
 <<product collection>>
