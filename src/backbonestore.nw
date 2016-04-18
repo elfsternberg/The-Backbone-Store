@@ -70,7 +70,7 @@ To demonstrate the basics of Backbone, I'm going to create a simple
 one-page application, a store for record albums, with two unique views:
 a list of all products and a product detail view.  I will also put a
 shopping cart widget on the page that shows the user how many products
-he or she has dropped into the cart.  I'll use some simple animations to
+have been has dropped into the cart.  I'll use some simple animations to
 transition between the catalog and the product detail pages.
 
 \subsection{Models, Collections, and Controllers}
@@ -78,20 +78,22 @@ transition between the catalog and the product detail pages.
 Backbone's data layer provides two classes, [[Collection]] and
 [[Model]].
 
-Every web application has data, often tabular data. Full-stack web
-developers are (or ought to be) familiar with the \textit{triples} of
-addressing objects on the web: Table URL → Row → Field, or Page URL →
-HTML Node → Content.  The [[Collection]] object represents just that: a
-collection of similar items.  The [[Model]] represents exactly one of
-those items.  
+Every web application has data, often tabular data.  Addressing tabular
+data usually involves three parts: The \textit{table}, \textit{row}, and
+\textit{column}.  In Backbone, these are represented by the
+[[Collection]], the [[Model]], and the [[attribute]].  The
+[[Collection]] often has a URL indicating the back-end source of the
+table; the [[Model]] may have a URL indicating its specific row in the
+table, as a way of efficiently saving itserlf back to the table.
 
 To use the Model, you inherit from it using Backbone's own [[.extend()]]
-class method, adding or replacing methods in the child object as
-needed.  For our purposes, we have two models: [[Product]] represents
-something we wish to sell, and [[Item]] represents something currently
-in the customer's shopping cart.  
+class method, adding or replacing methods in the child object as needed.
+For our purposes, we have two models: [[Product]] represents something
+we wish to sell, and [[Item]] represents something currently in the
+customer's shopping cart.
 
-The Product literally has nothing to modify.
+The Product literally has nothing to modify.  It already provides all
+the methods we need.
 
 Shopping carts are a little odd; the convention is that [[Item]] is not a
 single instance of the product, but instead has a reference to the
@@ -123,15 +125,17 @@ var Item = Backbone.Model.extend({
 The methods [[.get(item)]] and [[.set(item, value)]] are at the heart of
 Backbone.Model.  They're how you set individual attributes on the object
 being manipulated.  Notice how I can 'get' the product, which is a
-Backbone.Model, and then 'get' its price.
+Backbone.Model, and then 'get' its price.  This is called a
+\textit{chain}, and is fairly common in Javascript.
 
-Backbone supplies its own event management toolkit.  Changing a model
-triggers various events, none of which matter here in this context so I
-silence the event, but then I tell the Item's Backbone.Collection that
-the Model has changed.  For this program, it is the collection as a
-whole whose value matters, because that collection as a whole represents
-our shopping cart.  Events are the primary way in which Backbone objects
-interact, so understanding them is key to using Backbone correctly.
+The big secret to Backbone is that it supplies an advanced event
+management toolkit.  Changing a model triggers various events, none of
+which matter here in this context so I silence the event, but then I
+tell the Item's Backbone.Collection that the Model has changed.  For
+this program, it is the collection as a whole whose value matters,
+because that collection as a whole represents our shopping cart.  Events
+are the primary way in which Backbone objects interact, so understanding
+them is key to using Backbone correctly.
 
 Collections, like Models, are just objects you can (and often must)
 extend to support your application's needs.  Just as a Model has
@@ -145,7 +149,11 @@ method is a simple JSON object representing either a Model's attributes,
 or a JSON list of the Collection's models' attributes.
 
 The [[Product.Collection]] will be loading its list of albums via these
-methods to (in our case) static JSON back-end.
+methods to (in our case) static JSON back-end.  Backbone provides a
+mechanism for fetching JSON (and you can override the [[.parse()]]
+method to handle XML, CSV, or whatever strikes your fancy); to use the
+default [[.fetch()]] method, capture and set the Collection's [[.url]]
+field:
 
 <<product collection>>=
 var ProductCollection = Backbone.Collection.extend({
@@ -154,8 +162,8 @@ var ProductCollection = Backbone.Collection.extend({
         this.url = options.url;
     },
 
-    comparator: function(item) {
-        return item.get('title');
+    comparator: function(product) {
+        return product.get('title');
     }
 });
 
@@ -164,7 +172,7 @@ var ProductCollection = Backbone.Collection.extend({
 The [[.model]] attribute tells the [[ProductCollection]] that if
 [[.add()]] or [[.fetch()]] are called and the contents are plain JSON,
 a new [[Product]] Model should be initialized with the JSON data and
-that will be used as a new object for the Collection.
+that will be used as a new object for the Collection. 
 
 The [[.comparator()]] method specifies the per-model value by which the
 Collection should be sorted.  Sorting happens automatically whenever the
@@ -185,7 +193,6 @@ a new one, exploiting the fact that, since we specified the Collection's
 Model above, it will automatically be created as a Model in the
 Collection at the end of this call.  In either case, we return the new 
 Item to be handled further by the calling code.
-
 
 <<cart collection>>=
 var ItemCollection = Backbone.Collection.extend({
@@ -233,7 +240,6 @@ next as the memo.
 });
 
 @ 
-
 
 \subsection {Views}
 

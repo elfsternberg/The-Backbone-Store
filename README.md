@@ -1,7 +1,7 @@
 # About
 
-The Backbone Store is a tutorial and demonstration application for the
-BackboneJS framework.
+The Backbone Store is a tutorial and demonstration application for
+BackboneJS, a javascript framework for managing data-driven websites.
 
 ## Installation
 
@@ -11,7 +11,7 @@ $ make setup all serve
 
 This will automatically run the NPM and Bower install scripts, placing
 the correct libraries into the target tree, build the actual application
-from the original source material, and start a server.
+from the original source material, and start a local server.
 
 ## Requirements
 
